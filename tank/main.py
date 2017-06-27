@@ -96,7 +96,6 @@ class tankBodyDriver1 (Driver):
 
 class MouseInput(ScrollableLayer):
     is_event_handler = True
-
     def __init__(self):
         super(MouseInput, self).__init__()
 
@@ -173,27 +172,35 @@ class MouseInput(ScrollableLayer):
 
 # Отрисовка первого танка
 class TankBodyLayer1(ScrollableLayer):
-    def __init__(self):
+    def __init__(self, picture, pos):
         super(TankBodyLayer1, self).__init__()
 
-        self.sprite = Sprite("res/tank_telo.png")
+        self.sprite = Sprite(picture)
 
-        self.sprite.position = 200, 100
+        self.sprite.position = pos
 
         self.sprite.max_forward_speed = 200
         self.sprite.max_reverse_speed = -100
 
         self.add(self.sprite)
-
+    def go(self):
         self.sprite.do(tankBodyDriver1())
 
-tank_body_layer1 = TankBodyLayer1()
+
+tank1 = TankBodyLayer1("res/tank_telo.png",(200,100))
+tank1.go()
+tank2 = TankBodyLayer1("res/tank_telo2.png",(300,300))
+
+tank_body_layer1 = tank1
+tank_body_layer2 = tank2
+
 MouseInput_layer = MouseInput()
 
 map_layer = load("res/road.tmx")["map0"]
 
 scroller.add(map_layer)
 scroller.add(tank_body_layer1)
+scroller.add(tank_body_layer2)
 scroller.add(MouseInput_layer)
 
 scene = Scene(scroller)

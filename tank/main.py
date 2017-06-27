@@ -48,6 +48,7 @@ time_point1 = 0
 
 
 bool = 1
+bool2 = 1
 # Управление надписью 'перезарядка'
 class TextDriver1(Driver):
     def step(self, dt):
@@ -83,16 +84,15 @@ class tankBulletDriver1 (Driver):
     def step(self, dt):
         global tank2_health
         global bool
+        global bool2
         super(tankBulletDriver1, self).step(dt)
         self.target.speed = 500
 
-        if bool:
+        if bool and bool2:
             if math.sqrt(abs(tank2_body_position_x - self.target.x) ** 2 + abs(
             tank2_body_position_y - self.target.y) ** 2) <= 20:
                 tank2_health -= 20
-                print(tank2_health)
                 pushka2.text1.element.text = str(tank2_health)
-
                 #tank2.sprite.do(ScaleBy(1.5, 0.2)+ScaleBy(2/3, 0.2))
                 tank2.sprite.do(RotateTo(-15, 0.2)+RotateTo(+15, 0.2)+RotateTo(-15, 0.2)+RotateTo(+15, 0.2))
                 bool = 0
@@ -100,6 +100,7 @@ class tankBulletDriver1 (Driver):
                 tank2.sprite.do(ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2)+ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
                 tank2.sprite.do(Acrions.FadeOut(1))
                 pushka2.sprite.do(Acrions.FadeOut(1))
+                bool2 = 0
 
 
 # Управление телом первого танка

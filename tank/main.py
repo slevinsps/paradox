@@ -77,8 +77,8 @@ class tankBodyDriver1 (Driver):
         global tank1_body_position_y
         global tank1_body_rotation
 
-        self.target.rotation += (keyboard[key.RIGHT] - keyboard[key.LEFT]) * 100 * dt
-
+        self.target.rotation += (keyboard[key.RIGHT] - keyboard[key.LEFT]) * 30 * dt
+        print()
         self.target.acceleration = (keyboard[key.UP] - keyboard[key.DOWN]) * 350
 
         if keyboard[key.SPACE]:
@@ -126,6 +126,7 @@ class MouseInput(ScrollableLayer):
 
         self.add(self.sprite)
         self.add(self.text)
+        self.sprite.do(tankGunDriver1())
 
     def update_gun(self, mouse_x_pos, mouse_y_pos):
 
@@ -138,8 +139,6 @@ class MouseInput(ScrollableLayer):
 
         global tank_rotation
         tank_rotation = self.sprite.rotation
-
-        self.sprite.do(tankGunDriver1())
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.update_gun(x, y)
@@ -161,7 +160,6 @@ class MouseInput(ScrollableLayer):
             if time_point2 - time_point1 > 1:
                 self.push_bullet()
                 time_point1 = time.clock()
-                print("dsds")
 
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
 
@@ -174,8 +172,10 @@ class MouseInput(ScrollableLayer):
                 self.j -= 1
                 self.sprite_array[self.j].stop()
                 self.sprite_array[self.j].do(Acrions.FadeOut(0))
-                self.sprite_array[self.j].do(Acrions.MoveTo((tank1_body_position_x, tank1_body_position_y), 0.1))
-        if self.j<len(self.sprite_array):
+                #self.sprite_array[self.j].do(Acrions.MoveTo((tank1_body_position_x, tank1_body_position_y), 0.1))
+                self.sprite_array[self.j].position = tank1_body_position_x, tank1_body_position_y
+
+        if self.j < len(self.sprite_array):
 
             self.sprite_array[self.j].x = tank1_body_position_x
             self.sprite_array[self.j].y = tank1_body_position_y

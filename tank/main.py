@@ -13,7 +13,7 @@ from cocos.actions import Driver
 from pyglet.window import key
 from pyglet.window import mouse
 from cocos.director import director
-from cocos.actions import  Rotate, MoveBy, ScaleBy, Flip, Waves3D,RotateTo
+from cocos.actions import  Rotate, MoveBy, ScaleBy, Flip, Waves3D,RotateTo,RotateBy
 from cocos.sprite import Sprite
 director.init(width=800, height=600, autoscale=False, resizable=True)
 
@@ -36,7 +36,7 @@ tank2_body_rotation = 0
 tank1_gun__rotation = 0
 
 # Здороваье и урон первого танка
-tank1_health = 10
+tank1_health = 100
 tank1_damage = 3
 
 # Здороваье и урон второго танка
@@ -46,9 +46,9 @@ tank2_damage = 3
 #перемнная для времени
 time_point1 = 0
 
-
 bool = 1
 bool2 = 1
+bool_border = 1
 # Управление надписью 'перезарядка'
 class TextDriver1(Driver):
     def step(self, dt):
@@ -93,8 +93,7 @@ class tankBulletDriver1 (Driver):
             tank2_body_position_y - self.target.y) ** 2) <= 20:
                 tank2_health -= 20
                 pushka2.text1.element.text = str(tank2_health)
-                #tank2.sprite.do(ScaleBy(1.5, 0.2)+ScaleBy(2/3, 0.2))
-                tank2.sprite.do(RotateTo(-15, 0.2)+RotateTo(+15, 0.2)+RotateTo(-15, 0.2)+RotateTo(+15, 0.2))
+                tank2.sprite.do(RotateBy(-15, 0.2)+RotateBy(+15, 0.2)+RotateBy(-15, 0.2)+RotateBy(+15, 0.2))
                 bool = 0
             if tank2_health == 0:
                 tank2.sprite.do(ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2)+ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
@@ -109,9 +108,48 @@ class tankBodyDriver1 (Driver):
         global tank1_body_position_x
         global tank1_body_position_y
         global tank1_body_rotation
+        global tank1_health
+        global bool_border
+
+        if tank1_health == 0 and bool_border:
+            tank1.sprite.do(ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
+            tank1.sprite.do(Acrions.FadeOut(1))
+            pushka1.sprite.do(Acrions.FadeOut(1))
+            pushka1.text1.do(Acrions.FadeOut(1))
+            pushka1.text.do(Acrions.FadeOut(0))
+            bool_border = 0
+        if bool_border:
+           if self.target.x <= 50:
+               self.target.x = 51
+               self.target.speed = 0
+               tank1_health -= 5
+               pushka1.text1.element.text = str(tank1_health)
+               tank1.sprite.do(RotateBy(-10, 0.2) + RotateBy(+10, 0.2) + RotateBy(-10, 0.2) + RotateBy(+10, 0.2))
+           if self.target.x >= 1229:
+               self.target.x = 1228
+               self.target.speed = 0
+               tank1_health -= 5
+               pushka1.text1.element.text = str(tank1_health)
+               tank1.sprite.do(RotateBy(-10, 0.2) + RotateBy(+10, 0.2) + RotateBy(-10, 0.2) + RotateBy(+10, 0.2))
+           if self.target.y <= 50:
+               self.target.y = 51
+               self.target.speed = 0
+               tank1_health -= 5
+               pushka1.text1.element.text = str(tank1_health)
+               tank1.sprite.do(RotateBy(-10, 0.2) + RotateBy(+10, 0.2) + RotateBy(-10, 0.2) + RotateBy(+10, 0.2))
+           if self.target.y >= 1229:
+               self.target.y = 1228
+               self.target.speed = 0
+               tank1_health -= 5
+               pushka1.text1.element.text = str(tank1_health)
+               tank1.sprite.do(RotateBy(-10, 0.2) + RotateBy(+10, 0.2) + RotateBy(-10, 0.2) + RotateBy(+10, 0.2))
+
+
 
         self.target.rotation += (keyboard[key.D] - keyboard[key.A]) * 30 * dt
         self.target.acceleration = (keyboard[key.W] - keyboard[key.S]) * 350
+
+
 
         if keyboard[key.ENTER]:
             self.target.speed = 0

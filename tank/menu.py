@@ -29,7 +29,7 @@ class Authors(Menu):
         super( Authors, self).__init__()
 
         auth_1 = MenuItem(' Константин Чимпоеш ', self.on_callback)
-        auth_2 = MenuItem(' Доктор Артем', self.on_callback)
+        auth_2 = MenuItem(' Доктор Артём', self.on_callback)
         auth_3 = MenuItem(' Спасенов Иван', self.on_callback())
 
         back_item = ImageMenuItem('res/back.png', self.on_back)

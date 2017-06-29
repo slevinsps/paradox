@@ -727,4 +727,4 @@ scene = Scene(scroller)
 
 director.window.push_handlers(keyboard)
 
-director.run(scene)
+#director.run(scene)

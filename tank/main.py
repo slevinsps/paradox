@@ -13,6 +13,8 @@ from cocos.actions import*
 from pyglet.window import key
 from cocos.director import director
 from cocos.actions import  Rotate, MoveBy, ScaleBy, Flip, Waves3D,RotateTo
+import FirstTankClass
+import SecondTankClass
 
 director.init(width=800, height=600, autoscale=False, resizable=True)
 
@@ -89,20 +91,24 @@ class textDriver(Driver):
 
     # Настройка класса(выбор к какому танку подключается драйвер)
     def textDriver_settings(self,
-                            tank_body_position_x,
-                            tank_body_position_y,
+                            number_of_tank,
                             dx,
                             dy):
-        self.tank_body_position_x = tank_body_position_x
-        self.tank_body_position_y = tank_body_position_y
+        self.number_of_tank = number_of_tank
         self.dx = dx
         self.dy = dy
 
     def step(self, dt):
         super(textDriver, self).step(dt)
 
-        self.target.x = self.tank_body_position_x + self.dx
-        self.target.y = self.tank_body_position_y + self.dy
+        if self.number_of_tank == 1:
+            global tank1_body_position_x, tank1_body_position_y
+            self.target.x = tank1_body_position_x + self.dx
+            self.target.y = tank1_body_position_y + self.dy
+        else:
+            global tank2_body_position_x, tank2_body_position_y
+            self.target.x = tank2_body_position_x + self.dx
+            self.target.y = tank2_body_position_y + self.dy
 
 # Управление дулом пушки первого тела
 class tankGunDriver(Driver):
@@ -416,22 +422,18 @@ class tankGunAndBulletLayer(ScrollableLayer):
 
         if number_of_tank == 1:
             global tank1_body_position_x, tank1_body_position_y
-            driver_health.textDriver_settings(tank1_body_position_x,
-                                              tank1_body_position_y,
+            driver_health.textDriver_settings(1,
                                               0,
                                               0)
-            driver_recharge.textDriver_settings(tank1_body_position_x,
-                                              tank1_body_position_y,
+            driver_recharge.textDriver_settings(1,
                                               0,
                                               100)
         else:
             global tank2_body_position_x, tank2_body_position_y
-            driver_health.textDriver_settings(tank2_body_position_x,
-                                              tank2_body_position_y,
+            driver_health.textDriver_settings(2,
                                               0,
                                               0)
-            driver_recharge.textDriver_settings(tank2_body_position_x,
-                                                tank2_body_position_y,
+            driver_recharge.textDriver_settings(2,
                                                 0,
                                                 100)
 
@@ -547,138 +549,140 @@ class TankBodyLayer(ScrollableLayer):
 
         self.add(self.tank_body_image)
 
-#key1 - направление движения. Может принимать значения w(ехать вперёд),s(ехать назад)
-#speed - скорость движения
-#rotation - угол кривизны движения
-def move_tank_body(key = "w", speed = 0, rotation = 0, number_of_tank = 1):
+#Заполнение функций из библиотеки
+class tank_library_initialize():
 
-    if number_of_tank == 1:
+    #key1 - направление движения. Может принимать значения w(ехать вперёд),s(ехать назад)
+    #speed - скорость движения
+    #rotation - угол кривизны движения
+    def move_tank_body(key = "w", speed = 0, rotation = 0, number_of_tank = 1):
 
-        tank1_body_layer.tank_body_image.stop()
-        body_driver = tankBodyDriver()
+        if number_of_tank == 1:
 
-        global TANK1_MAX_FORWARD_SPEED
-        global TANK1_MAX_REVERSE_SPEED
-        global tank1_body_position_x
-        global tank1_body_position_y
-        global tank1_body_rotation
+            tank1_body_layer.tank_body_image.stop()
+            body_driver = tankBodyDriver()
 
-        body_driver.tankBodyDriver_setting(
-            number_of_tank,
-            tank1_body_position_x,
-            tank1_body_position_y,
-            tank1_body_rotation,
-            key,
-            speed,
-            TANK1_MAX_FORWARD_SPEED,
-            TANK1_MAX_REVERSE_SPEED,
-            rotation
-        )
-        tank1_body_layer.tank_body_image.do(body_driver)
+            global TANK1_MAX_FORWARD_SPEED
+            global TANK1_MAX_REVERSE_SPEED
+            global tank1_body_position_x
+            global tank1_body_position_y
+            global tank1_body_rotation
 
-        gun_driver = tankGunDriver()
-        gun_driver.tankGunDriver_settings(tank1_body_position_x,
-                                          tank1_body_position_y,
-                                          tank1_gun_rotation,
-                                          0,
-                                          'r',
-                                          0,
-                                          1)
-        tank1_gun_layer.tank_gun_image.do(gun_driver)
-    else:
-        global TANK2_MAX_FORWARD_SPEED
-        global TANK2_MAX_REVERSE_SPEED
-        global tank2_body_position_x
-        global tank2_body_position_y
-        global tank2_body_rotation
+            body_driver.tankBodyDriver_setting(
+                number_of_tank,
+                tank1_body_position_x,
+                tank1_body_position_y,
+                tank1_body_rotation,
+                key,
+                speed,
+                TANK1_MAX_FORWARD_SPEED,
+                TANK1_MAX_REVERSE_SPEED,
+                rotation
+            )
+            tank1_body_layer.tank_body_image.do(body_driver)
 
-        tank2_body_layer.tank_body_image.stop()
-        body_driver = tankBodyDriver()
-        body_driver.stop()
+            gun_driver = tankGunDriver()
+            gun_driver.tankGunDriver_settings(tank1_body_position_x,
+                                              tank1_body_position_y,
+                                              tank1_gun_rotation,
+                                              0,
+                                              'r',
+                                              0,
+                                              1)
+            tank1_gun_layer.tank_gun_image.do(gun_driver)
+        else:
+            global TANK2_MAX_FORWARD_SPEED
+            global TANK2_MAX_REVERSE_SPEED
+            global tank2_body_position_x
+            global tank2_body_position_y
+            global tank2_body_rotation
 
-        body_driver.tankBodyDriver_setting(
-            number_of_tank,
-            tank2_body_position_x,
-            tank2_body_position_y,
-            tank2_body_rotation,
-            key,
-            speed,
-            TANK2_MAX_FORWARD_SPEED,
-            TANK2_MAX_REVERSE_SPEED,
-            rotation
-        )
-        tank2_body_layer.tank_body_image.do(body_driver)
+            tank2_body_layer.tank_body_image.stop()
+            body_driver = tankBodyDriver()
+            body_driver.stop()
 
-        gun_driver = tankGunDriver()
-        gun_driver.tankGunDriver_settings(tank1_body_position_x,
-                                          tank1_body_position_y,
-                                          tank1_gun_rotation,
-                                          0,
-                                          'r',
-                                          0,
-                                          2)
-        tank2_gun_layer.tank_gun_image.do(gun_driver)
+            body_driver.tankBodyDriver_setting(
+                number_of_tank,
+                tank2_body_position_x,
+                tank2_body_position_y,
+                tank2_body_rotation,
+                key,
+                speed,
+                TANK2_MAX_FORWARD_SPEED,
+                TANK2_MAX_REVERSE_SPEED,
+                rotation
+            )
+            tank2_body_layer.tank_body_image.do(body_driver)
 
-#side - направление движения. Может принимать значения right(по часовой стрелке), left(против часовой стрелки)
-#angle - угол, на который повернется танк
-def rotate_gun(angle = 1, side = 'right', number_of_tank = 1):
-    assert (angle > 0)
+            gun_driver = tankGunDriver()
+            gun_driver.tankGunDriver_settings(tank1_body_position_x,
+                                              tank1_body_position_y,
+                                              tank1_gun_rotation,
+                                              0,
+                                              'r',
+                                              0,
+                                              2)
+            tank2_gun_layer.tank_gun_image.do(gun_driver)
 
-    if number_of_tank == 1:
-        global stop_tank1_gun_side_angle
+    #side - направление движения. Может принимать значения right(по часовой стрелке), left(против часовой стрелки)
+    #angle - угол, на который повернется танк
+    def rotate_gun(angle = 1, side = 'right', number_of_tank = 1):
+        assert (angle > 0)
 
-        global tank1_body_position_x
-        global tank1_body_position_y
-        global tank1_gun_rotation
+        if number_of_tank == 1:
+            global stop_tank1_gun_side_angle
 
-        tank1_gun_layer.tank_gun_image.stop()
-        gun_driver = tankGunDriver()
+            global tank1_body_position_x
+            global tank1_body_position_y
+            global tank1_gun_rotation
 
-        stop_tank1_gun_side_angle = 0
+            tank1_gun_layer.tank_gun_image.stop()
+            gun_driver = tankGunDriver()
 
-        gun_driver.tankGunDriver_settings(tank1_body_position_x,
-                                            tank1_body_position_y,
-                                            tank1_gun_rotation,
-                                            angle,
-                                            side,
-                                            stop_tank1_gun_side_angle,
-                                            1)
+            stop_tank1_gun_side_angle = 0
 
-        tank1_gun_layer.tank_gun_image.do(gun_driver)
-    else:
-        global stop_tank2_gun_side_angle
+            gun_driver.tankGunDriver_settings(tank1_body_position_x,
+                                                tank1_body_position_y,
+                                                tank1_gun_rotation,
+                                                angle,
+                                                side,
+                                                stop_tank1_gun_side_angle,
+                                                1)
 
-        global tank2_body_position_x
-        global tank2_body_position_y
-        global tank2_gun_rotation
+            tank1_gun_layer.tank_gun_image.do(gun_driver)
+        else:
+            global stop_tank2_gun_side_angle
 
-        tank2_gun_layer.tank_gun_image.stop()
-        gun_driver = tankGunDriver()
+            global tank2_body_position_x
+            global tank2_body_position_y
+            global tank2_gun_rotation
 
-        stop_tank2_gun_side_angle = 0
+            tank2_gun_layer.tank_gun_image.stop()
+            gun_driver = tankGunDriver()
 
-        gun_driver.tankGunDriver_settings(tank2_body_position_x,
-                                          tank2_body_position_y,
-                                          tank2_gun_rotation,
-                                          angle,
-                                          side,
-                                          stop_tank2_gun_side_angle,
-                                          2)
-        tank2_gun_layer.tank_gun_image.do(gun_driver)
+            stop_tank2_gun_side_angle = 0
 
-class driverByFirstUser(Driver):
-    def step(self, dt):
-        if(tank1_body_position_y <= tank1_start_y+100):
-            move_tank_body('w', 70, 0, 1)
-        if(tank1_body_position_y >= 300):
-            move_tank_body('w', -70, 0, 1)
-            rotate_gun(115, 'right', 1)
+            gun_driver.tankGunDriver_settings(tank2_body_position_x,
+                                              tank2_body_position_y,
+                                              tank2_gun_rotation,
+                                              angle,
+                                              side,
+                                              stop_tank2_gun_side_angle,
+                                              2)
+            tank2_gun_layer.tank_gun_image.do(gun_driver)
 
-class driverBySecondUser(Driver):
-    def step(self, dt):
-        move_tank_body('w', 20, 30, 2)
-        #print(tank2_body_position_x)
-        rotate_gun(15, 'right', 2)
+#class driverByFirstUser(Driver):
+#    def step(self, dt):
+#        if(tank1_body_position_y <= tank1_start_y+100):
+#            tank_library_initialize.move_tank_body('w', 70, 0, 1)
+#        if(tank1_body_position_y >= 300):
+#            tank_library_initialize.move_tank_body('w', -70, 0, 1)
+#            tank_library_initialize.rotate_gun(115, 'right', 1)
+#
+#class driverBySecondUser(Driver):
+#    def step(self, dt):
+#        tank_library_initialize.move_tank_body('w', 20, 30, 2
+#        tank_library_initialize.rotate_gun(15, 'right', 2)
 
 
 #Создание класса корпуса первого танка
@@ -709,9 +713,14 @@ tank2_gun_layer = tankGunAndBulletLayer(tank2_body_position_x,
                                         (0, 0, 255, 255),
                                         2,
                                         bool2)
+
+#Обнолвение библиотечных функций
+FirstTankClass.tank_mechanics.move_tank_body = tank_library_initialize.move_tank_body
+FirstTankClass.tank_mechanics.rotate_gun = tank_library_initialize.rotate_gun
+
 #Подключение драйверов разработчиков
-tank1_body_layer.do(driverByFirstUser())
-tank2_body_layer.do(driverBySecondUser())
+tank1_body_layer.do(FirstTankClass.driverByFirstUser())
+tank2_body_layer.do(SecondTankClass.driverBySecondUser())
 
 #Настройка карты
 map_layer = load("res/road.tmx")["map0"]

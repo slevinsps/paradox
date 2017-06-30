@@ -9,6 +9,10 @@ class tank_mechanics(object):
         pass
 
     @abstractmethod
+    def set_nickname(nickname = 'Tank', number_of_tank=1):
+        pass
+
+    @abstractmethod
     def move_tank_body(key="w", speed=0, rotation=0, number_of_tank=1):
         pass
 

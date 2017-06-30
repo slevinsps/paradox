@@ -28,7 +28,7 @@ tank1_body_position_y = 100
 tank1_body_rotation = 0
 
 # Координаты тела второго танка
-tank2_body_position_x = 300
+tank2_body_position_x = 500
 tank2_body_position_y = 300
 tank2_body_rotation = 0
 
@@ -75,6 +75,8 @@ BULLET_MAX_SPEED = 500
 #перемнные для времени
 time_point1 = 0
 time_point2 = 0
+time1 = 0
+time2 = 0
 
 #Прекращение вращения
 stop_tank1_gun_side_angle = 0
@@ -318,6 +320,8 @@ class tankBodyDriver (Driver):
         self.change_angle(dt)
         self.change_speed()
 
+
+        #self.determine_hit()
         if (self.number_of_tank == 1):
 
             tank1_body_position_x = self.target.x
@@ -342,6 +346,7 @@ class tankBodyDriver (Driver):
                                                  tank1_body_layer, self.target.y <= 50, 53, self.target.y)
                 self.target.y = self.manage_side(1, tank1_gun_layer,
                                                  tank1_body_layer, self.target.y >= 1229, 1226, self.target.y)
+
 
         elif (self.number_of_tank == 2):
 
@@ -368,7 +373,36 @@ class tankBodyDriver (Driver):
                 self.target.y = self.manage_side(2, tank2_gun_layer,
                                                  tank2_body_layer, self.target.y >= 1229, 1226, self.target.y)
 
-        #scroller.set_focus(self.target.x, self.target.y)
+
+
+
+######################################
+
+    #def determine_hit(self):
+    #    global bool_end, tank1_health, tank2_health, time1,time2
+    #    global tank1_body_position_x, tank1_body_position_y
+    #    global tank2_body_position_x, tank2_body_position_y
+    #    if math.sqrt(abs(tank1_body_position_x - tank2_body_position_x) ** 2 + abs(
+    #                    tank1_body_position_y - tank2_body_position_y) ** 2) <= 36:
+    #        if time2 == time1 == 0:
+    #            time2 = time.clock()
+    #            time1 = time.clock()
+#
+    #        if time2 - time1 > 1:
+    #            self.push_bullet()
+    #        else:
+    #            time2 = time.clock()
+#
+    #        self.target.speed = 0
+    #        tank2_health -= WALL_DAMAGE
+    #        tank2_gun_layer.text_health.element.text = str(tank1_health)
+    #        tank1_health -= WALL_DAMAGE
+    #        tank1_gun_layer.text_health.element.text = str(tank1_health)
+    #        tank1_body_layer.tank_body_image.do(
+    #            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+    #        tank2_body_layer.tank_body_image.do(
+    #            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+    # ###############################
 
     def manage_side(self, number_of_tank, tank_gun_layer, tank_body_layer, bool, true, false):
         coordinate = false
@@ -519,13 +553,19 @@ class tankGunAndBulletLayer(ScrollableLayer):
         if key == 49:
             tankFocusDriver1 = tankFocusDriver()
             tankFocusDriver1.tankFocusDriver_settings(1)
-            tank1_body_layer.camera_image.do(tankFocusDriver1)
+            tank2_body_layer.focus_frame.stop()
+            tank2_body_layer.focus_frame.do(Acrions.FadeOut(0))
+            tank1_body_layer.focus_frame.do(Acrions.FadeIn(0))
+            tank1_body_layer.focus_frame.do(tankFocusDriver1)
 
 
         if key == 50:
             tankFocusDriver2 = tankFocusDriver()
             tankFocusDriver2.tankFocusDriver_settings(2)
-            tank1_body_layer.camera_image.do(tankFocusDriver2)
+            tank1_body_layer.focus_frame.stop()
+            tank1_body_layer.focus_frame.do(Acrions.FadeOut(0))
+            tank2_body_layer.focus_frame.do(Acrions.FadeIn(0))
+            tank2_body_layer.focus_frame.do(tankFocusDriver2)
 
     # Полёт ракеты
     def push_bullet(self):
@@ -578,18 +618,23 @@ class TankBodyLayer(ScrollableLayer):
 
     tank_body_image = Sprite("res/bullet.png")
     camera_image = Sprite("res/camera.png")
+    focus_frame = Sprite("res/focus_frame.png")
 
     def __init__(self, picture, pos, max_speed, min_speed):
 
         super(TankBodyLayer, self).__init__()
 
         self.tank_body_image = Sprite(picture)
+        self.focus_frame = Sprite("res/focus_frame.png")
         self.tank_body_image.position = pos
+        self.focus_frame.position = pos
 
         self.tank_body_image.max_forward_speed = max_speed
         self.tank_body_image.max_reverse_speed = min_speed
 
         self.add(self.tank_body_image)
+        self.add(self.focus_frame)
+        self.focus_frame.do(Acrions.FadeOut(0))
         self.camera_image = Sprite("res/camera.png")
         self.add(self.camera_image)
 

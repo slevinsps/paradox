@@ -111,6 +111,24 @@ RELOAD_IMAGE_SIZE = 20
 # Все объекты графического интерфейса, привязанные к танкам, цепляем за класс отрисовки пушки!
 # В драйвере stripDriver закрепляем их координаты
 
+class tankFocusDriver(Driver):
+
+    def tankFocusDriver_settings(self,
+                                number_of_tank):
+        self.number_of_tank = number_of_tank
+
+    def step(self, dt):
+        super(tankFocusDriver, self).step(dt)
+        if self.number_of_tank == 1:
+            global tank1_body_position_x, tank1_body_position_y
+            self.target.x = tank1_body_position_x
+            self.target.y = tank1_body_position_y
+        else:
+            global tank2_body_position_x, tank2_body_position_y
+            self.target.x = tank2_body_position_x
+            self.target.y = tank2_body_position_y
+        scroller.set_focus(self.target.x, self.target.y)
+
 # Управление полоской здоровья
 class stripDriver(Driver):
 
@@ -127,6 +145,7 @@ class stripDriver(Driver):
             self.target.x = tank1_body_position_x
             self.target.y = tank1_body_position_y
             tank1_gun_layer.remove(health_strip1)
+            scroller.set_focus(self.target.x, self.target.y)
             health_strip1 = strip_canvas(tank1_body_position_x,
                                         tank1_body_position_y,
                                         (255, 0, 0, 255),
@@ -144,6 +163,7 @@ class stripDriver(Driver):
             self.target.x = tank2_body_position_x
             self.target.y = tank2_body_position_y
             tank2_gun_layer.remove(health_strip2)
+            scroller.set_focus(self.target.x, self.target.y)
             health_strip2 = strip_canvas(tank2_body_position_x,
                                     tank2_body_position_y,
                                     (0, 0, 255, 255),
@@ -162,13 +182,13 @@ class tankGunDriver(Driver):
 
     # Настройка класса(выбор к какому танку подключается драйвер)
     def tankGunDriver_settings(self,
-                                tank_body_position_x,
-                                tank_body_position_y,
-                                tank_gun_rotation,
-                                user_tank_gun_angle,
-                                user_tank_gun_side_angle,
-                                stop_tank_gun_side_angle,
-                                number_of_tank):
+                                tank_body_position_x = 0,
+                                tank_body_position_y = 0,
+                                tank_gun_rotation = 0,
+                                user_tank_gun_angle = 0,
+                                user_tank_gun_side_angle = 'r',
+                                stop_tank_gun_side_angle = 0,
+                                number_of_tank  = 1):
         self.tank_body_position_x = tank_body_position_x
         self.tank_body_position_y = tank_body_position_y
         self.tank_gun_rotation = tank_gun_rotation
@@ -178,11 +198,12 @@ class tankGunDriver(Driver):
         self.number_of_tank = number_of_tank
 
     def step(self, dt):
-        global TANK_MAX_ANGLE_OF_GUN_ROTATION
+        global TANK_MAX_ANGLE_OF_GUN_ROTATION, tank1_body_position_x
+
 
         super(tankGunDriver, self).step(dt)
 
-        self.target.rotation += (keyboard[key._1] - keyboard[key._2]) * TANK_MAX_ANGLE_OF_GUN_ROTATION * dt
+        #self.target.rotation += (keyboard[key._1] - keyboard[key._2]) * TANK_MAX_ANGLE_OF_GUN_ROTATION * dt
         if self.stop_tank_gun_side_angle != 50:
             if self.user_tank_gun_angle < TANK_MAX_ANGLE_OF_GUN_ROTATION:
                 if self.user_tank_gun_side_angle == "right":
@@ -202,6 +223,8 @@ class tankGunDriver(Driver):
             global tank1_body_position_x, tank1_body_position_y
             self.target.x = tank1_body_position_x
             self.target.y = tank1_body_position_y
+
+            print(self.target.x, tank1_body_position_x)
         else:
             global tank2_body_position_x, tank2_body_position_y
             self.target.x = tank2_body_position_x
@@ -276,21 +299,38 @@ class tankBulletDriver(Driver):
                         RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
                     bool2 = 0
                 self.bool = 0
-            if self.tank_health == 0:
-                    if self.number_of_tank == 1 and tank1_health == 0:
+            if self.tank_health <= 0:
+                    if self.number_of_tank == 2 and tank1_health <= 0:
                         tank1_body_layer.stop()
                         tank1_body_layer.tank_body_image.stop()
+                        tank1_gun_layer.stop()
+                        tank1_gun_layer.reload_image.stop()
+                        nickname1_label.stop()
+                        tank1_gun_layer.remove(health_strip1)
+                        tank1_gun_layer.remove(tank1_gun_layer.reload_image)
+
                         tank1_body_layer.tank_body_image.do(
                             ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
                         tank1_body_layer.tank_body_image.do(Acrions.FadeOut(1))
                         tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
-                    elif self.number_of_tank == 2 and tank2_health == 0:
+                        nickname1_label.do(Acrions.FadeOut(1))
+                        health_strip1.do(Acrions.FadeOut(1))
+
+                    elif self.number_of_tank == 1 and tank2_health <= 0:
                         tank2_body_layer.stop()
                         tank2_body_layer.tank_body_image.stop()
+                        tank2_gun_layer.stop()
+                        tank2_gun_layer.reload_image.stop()
+                        nickname2_label.stop()
+                        tank2_gun_layer.remove(health_strip2)
+                        tank2_gun_layer.remove(tank2_gun_layer.reload_image)
+
                         tank2_body_layer.tank_body_image.do(
                             ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
                         tank2_body_layer.tank_body_image.do(Acrions.FadeOut(1))
                         tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
+                        nickname2_label.do(Acrions.FadeOut(1))
+                        health_strip2.do(Acrions.FadeOut(1))
                     bool_end = 0
 
 # Управление телом первого танка
@@ -298,7 +338,7 @@ class tankBodyDriver (Driver):
 
     # Настройка класса(выбор к какому танку подключается драйвер)
     def tankBodyDriver_setting(self,
-                               number_of_tank = 0,
+                               number_of_tank = 1,
                                tank_body_x = 0,
                                tank_body_y = 0,
                                tank_body_rotation = 0,
@@ -372,7 +412,34 @@ class tankBodyDriver (Driver):
                 self.target.y = self.manage_side(2, tank2_gun_layer,
                                                  tank2_body_layer, self.target.y >= 1229, 1226, self.target.y)
 
-        scroller.set_focus(self.target.x, self.target.y)
+
+    ######################################
+
+    #def determine_hit(self):
+    #    global bool_end, tank1_health, tank2_health, time1,time2
+    #    global tank1_body_position_x, tank1_body_position_y
+    #    global tank2_body_position_x, tank2_body_position_y
+    #    if math.sqrt(abs(tank1_body_position_x - tank2_body_position_x) ** 2 + abs(
+    #                    tank1_body_position_y - tank2_body_position_y) ** 2) <= 36:
+    #        if time2 == time1 == 0:
+    #            time2 = time.clock()
+    #            time1 = time.clock()
+    #
+    #        if time2 - time1 > 1:
+    #            self.push_bullet()
+    #        else:
+    #            time2 = time.clock()
+    #
+    #        self.target.speed = 0
+    #        tank2_health -= WALL_DAMAGE
+    #        tank2_gun_layer.text_health.element.text = str(tank1_health)
+    #        tank1_health -= WALL_DAMAGE
+    #        tank1_gun_layer.text_health.element.text = str(tank1_health)
+    #        tank1_body_layer.tank_body_image.do(
+    #            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+    #        tank2_body_layer.tank_body_image.do(
+    #            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+    # ###############################
 
     def manage_side(self, number_of_tank, tank_gun_layer, tank_body_layer, bool, true, false):
         coordinate = false
@@ -423,6 +490,7 @@ class tankGunAndBulletLayer(ScrollableLayer):
 
     reload_image = Sprite("res/reload.png")
     tank_gun_image = Sprite("res/tank_pushka.png")
+    bullet_array = [Sprite("res/bullet.png"), Sprite("res/bullet.png"), Sprite("res/bullet.png")]
 
     def __init__(self, x, y, health, enemy_health, text_color, number_of_tank, bool):
         super(tankGunAndBulletLayer, self).__init__()
@@ -488,11 +556,28 @@ class tankGunAndBulletLayer(ScrollableLayer):
         tank_gun_layer.reload_image.do(Rotate(360, 1))
         tank_gun_layer.reload_image.do(FadeOut(1))
 
-
     # Нажатие на клавишу
     def on_key_press(self, key, modifiers):
+        global tank1_body_position_x, tank1_body_position_y
         if key == 32:
             self.shoot_bullet()
+
+        if key == 49:
+            tankFocusDriver1 = tankFocusDriver()
+            tankFocusDriver1.tankFocusDriver_settings(1)
+            tank2_body_layer.focus_frame.stop()
+            tank2_body_layer.focus_frame.do(Acrions.FadeOut(0))
+            tank1_body_layer.focus_frame.do(Acrions.FadeIn(0))
+            tank1_body_layer.focus_frame.do(tankFocusDriver1)
+
+
+        if key == 50:
+            tankFocusDriver2 = tankFocusDriver()
+            tankFocusDriver2.tankFocusDriver_settings(2)
+            tank1_body_layer.focus_frame.stop()
+            tank1_body_layer.focus_frame.do(Acrions.FadeOut(0))
+            tank2_body_layer.focus_frame.do(Acrions.FadeIn(0))
+            tank2_body_layer.focus_frame.do(tankFocusDriver2)
 
     # Полёт ракеты
     def push_bullet(self):
@@ -541,23 +626,25 @@ class tankGunAndBulletLayer(ScrollableLayer):
 class TankBodyLayer(ScrollableLayer):
 
     tank_body_image = Sprite("res/bullet.png")
+    focus_frame = Sprite("res/focus_frame.png")
 
     def __init__(self, picture, pos, max_speed, min_speed):
 
         super(TankBodyLayer, self).__init__()
 
         self.tank_body_image = Sprite(picture)
+        self.focus_frame = Sprite("res/focus_frame.png")
         self.tank_body_image.position = pos
+        self.focus_frame.position = pos
 
         self.tank_body_image.max_forward_speed = max_speed
         self.tank_body_image.max_reverse_speed = min_speed
 
+        self.focus_frame.do(Acrions.FadeOut(0))
+
+        self.add(self.focus_frame)
         self.add(self.tank_body_image)
 
-#Слой с отображением полоски здоровья
-class strip_layer(ScrollableLayer):
-    def __init__(self, x = 0 , y = 0, main_color = (0,0,0,0), color = (0,0,0,0), health = 0):
-        super(strip_layer, self).__init__()
 
 #Рисование полоски
 class strip_canvas(draw.Canvas):
@@ -788,6 +875,7 @@ class tank_library_initialize():
                                               2)
             tank2_gun_layer.tank_gun_image.do(gun_driver)
 
+
 #class driverByFirstUser(Driver):
 #    def step(self, dt):
 #        if(tank1_body_position_y <= tank1_start_y+100):
@@ -848,20 +936,30 @@ nickname2_label = Label("Tank2",
 tank2_gun_layer.add(nickname2_label)
 
 # Полоска жизней первого танка и её настройка
-health_strip1 = strip_layer()
+health_strip1 = strip_canvas(0,
+                                    0,
+                                    (0, 0, 255, 255),
+                                    (0, 0, 122, 122),
+                                    tank1_health)
+tank1_gun_layer.add(health_strip1)
 
 strip_health1_driver = stripDriver()
 strip_health1_driver.stripDriver_settings(1)
 tank1_gun_layer.do(strip_health1_driver)
-tank1_gun_layer.add(health_strip1)
+
 
 # Полоска жизней второго танка и её настройка
-health_strip2 = strip_layer()
+health_strip2 = strip_canvas(0,
+                                    0,
+                                    (0, 0, 255, 255),
+                                    (0, 0, 122, 122),
+                                    tank2_health)
+
+tank2_gun_layer.add(health_strip2)
 
 strip_health2_driver = stripDriver()
 strip_health2_driver.stripDriver_settings(2)
 tank2_gun_layer.do(strip_health2_driver)
-tank2_gun_layer.add(health_strip2)
 
 #Обнолвение библиотечных функций
 FirstTankClass.tank_mechanics.move_tank_body = tank_library_initialize.move_tank_body
@@ -871,8 +969,8 @@ FirstTankClass.tank_mechanics.get_y = tank_library_initialize.get_y
 FirstTankClass.tank_mechanics.set_nickname = tank_library_initialize.set_nickname
 
 #Подключение драйверов разработчиков
-health_strip1.do(FirstTankClass.driverByFirstUser())
-health_strip2.do(SecondTankClass.driverBySecondUser())
+tank1_body_layer.do(FirstTankClass.driverByFirstUser())
+tank2_body_layer.do(SecondTankClass.driverBySecondUser())
 
 #Настройка карты
 map_layer = load("res/road.tmx")["map0"]
@@ -883,8 +981,6 @@ scroller.add(tank1_body_layer)
 scroller.add(tank2_body_layer)
 scroller.add(tank1_gun_layer)
 scroller.add(tank2_gun_layer)
-scroller.add(health_strip1)
-scroller.add(health_strip2)
 
 scene = Scene(scroller)
 

@@ -11,7 +11,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/tank$menu__1_.coverage" NAME="menu (1) Coverage Results" MODIFIED="1498744241915" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:/msys64/home/1/tank/iu7-bachelors-2020-summer-practice-2017-paradox/tank" />
-    <SUITE FILE_PATH="coverage/tank$menu.coverage" NAME="menu Coverage Results" MODIFIED="1498767088485" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/tank$menu.coverage" NAME="menu Coverage Results" MODIFIED="1498801542338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tank$main.coverage" NAME="main Coverage Results" MODIFIED="1498744057398" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
@@ -20,8 +20,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-370">
-              <caret line="255" column="30" lean-forward="false" selection-start-line="255" selection-start-column="8" selection-end-line="255" selection-end-column="30" />
+            <state relative-caret-position="266">
+              <caret line="756" column="67" lean-forward="true" selection-start-line="756" selection-start-column="67" selection-end-line="756" selection-end-column="67" />
               <folding>
                 <element signature="e#19#50#0" expanded="true" />
               </folding>
@@ -54,11 +54,9 @@
       <file leaf-file-name="FirstTankClass.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FirstTankClass.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="5" column="47" lean-forward="true" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="0">
+              <caret line="0" column="9" lean-forward="false" selection-start-line="0" selection-start-column="9" selection-end-line="0" selection-end-column="9" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -66,8 +64,8 @@
       <file leaf-file-name="SecondTankClass.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SecondTankClass.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="63">
-              <caret line="3" column="23" lean-forward="true" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="23" />
+            <state relative-caret-position="105">
+              <caret line="5" column="26" lean-forward="false" selection-start-line="5" selection-start-column="26" selection-end-line="5" selection-end-column="57" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -86,17 +84,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>tank2_gun_rotation</find>
-      <find>пере</find>
-      <find>number_of_tank</find>
-      <find>time_point1</find>
-      <find>tankBulletDriver</find>
-      <find>tankBulletDriver_settings</find>
-      <find>print</find>
-      <find>bool_coordinat1= 0</find>
-      <find>bool_coordinat1</find>
-      <find>manage_side</find>
-      <find>tank_damage</find>
       <find>bool_border2</find>
       <find>damage</find>
       <find>tank1_health</find>
@@ -107,7 +94,6 @@
       <find>self.bool</find>
       <find>WALL_DAMAGE</find>
       <find>rotate</find>
-      <find>rotate_gun</find>
       <find>tank_mechanic</find>
       <find>driverBySecondUser</find>
       <find>tank_mechanics</find>
@@ -116,6 +102,18 @@
       <find>textDriver_settings</find>
       <find>key</find>
       <find>tankBodyDriver_setting</find>
+      <find>wooow</find>
+      <find>change_speed</find>
+      <find>self.key_clicked</find>
+      <find>body_driver</find>
+      <find>move_body</find>
+      <find>move_</find>
+      <find>print</find>
+      <find>health</find>
+      <find>move_tank_body_1_code</find>
+      <find>it</find>
+      <find>move_tank_body</find>
+      <find>rotate_gun</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -124,8 +122,8 @@
         <option value="$PROJECT_DIR$/menu.py" />
         <option value="C:/msys64/home/1/tank/iu7-bachelors-2020-summer-practice-2017-paradox/tank/menu.py" />
         <option value="$PROJECT_DIR$/res/tank_library.py" />
-        <option value="$PROJECT_DIR$/tank_library.py" />
         <option value="$PROJECT_DIR$/FirstTankClass.py" />
+        <option value="$PROJECT_DIR$/tank_library.py" />
         <option value="$PROJECT_DIR$/SecondTankClass.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
@@ -561,18 +559,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SecondTankClass.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="63">
-          <caret line="3" column="23" lean-forward="true" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FirstTankClass.py">
-      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
-          <caret line="5" column="47" lean-forward="true" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
+          <caret line="5" column="26" lean-forward="false" selection-start-line="5" selection-start-column="26" selection-end-line="5" selection-end-column="57" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
@@ -587,10 +575,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/FirstTankClass.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="9" lean-forward="false" selection-start-line="0" selection-start-column="9" selection-end-line="0" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-370">
-          <caret line="255" column="30" lean-forward="false" selection-start-line="255" selection-start-column="8" selection-end-line="255" selection-end-column="30" />
+        <state relative-caret-position="266">
+          <caret line="756" column="67" lean-forward="true" selection-start-line="756" selection-start-column="67" selection-end-line="756" selection-end-column="67" />
           <folding>
             <element signature="e#19#50#0" expanded="true" />
           </folding>

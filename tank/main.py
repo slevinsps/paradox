@@ -94,6 +94,31 @@ move_tank_body_2_code = ''
 rotate_gun_1_code = ''
 rotate_gun_2_code = ''
 
+
+
+class tankFocusDriver(Driver):
+
+    def tankFocusDriver_settings(self,
+                                number_of_tank):
+        self.number_of_tank = number_of_tank
+
+    def step(self, dt):
+        super(tankFocusDriver, self).step(dt)
+        if self.number_of_tank == 1:
+            global tank1_body_position_x, tank1_body_position_y
+            self.target.x = tank1_body_position_x
+            self.target.y = tank1_body_position_y
+        else:
+            global tank2_body_position_x, tank2_body_position_y
+            self.target.x = tank2_body_position_x
+            self.target.y = tank2_body_position_y
+        scroller.set_focus(self.target.x, self.target.y)
+
+
+
+
+
+
 # Управление надписями
 class textDriver(Driver):
 
@@ -143,7 +168,7 @@ class tankGunDriver(Driver):
 
         super(tankGunDriver, self).step(dt)
 
-        self.target.rotation += (keyboard[key._1] - keyboard[key._2]) * TANK_MAX_ANGLE_OF_GUN_ROTATION * dt
+        #self.target.rotation += (keyboard[key._1] - keyboard[key._2]) * TANK_MAX_ANGLE_OF_GUN_ROTATION * dt
         if self.stop_tank_gun_side_angle != 50:
             if self.user_tank_gun_angle < TANK_MAX_ANGLE_OF_GUN_ROTATION:
                 if self.user_tank_gun_side_angle == "right":
@@ -343,7 +368,7 @@ class tankBodyDriver (Driver):
                 self.target.y = self.manage_side(2, tank2_gun_layer,
                                                  tank2_body_layer, self.target.y >= 1229, 1226, self.target.y)
 
-        scroller.set_focus(self.target.x, self.target.y)
+        #scroller.set_focus(self.target.x, self.target.y)
 
     def manage_side(self, number_of_tank, tank_gun_layer, tank_body_layer, bool, true, false):
         coordinate = false
@@ -487,8 +512,20 @@ class tankGunAndBulletLayer(ScrollableLayer):
 
     # Нажатие на клавишу
     def on_key_press(self, key, modifiers):
+        global tank1_body_position_x, tank1_body_position_y
         if key == 32:
             self.shoot_bullet()
+
+        if key == 49:
+            tankFocusDriver1 = tankFocusDriver()
+            tankFocusDriver1.tankFocusDriver_settings(1)
+            tank1_body_layer.camera_image.do(tankFocusDriver1)
+
+
+        if key == 50:
+            tankFocusDriver2 = tankFocusDriver()
+            tankFocusDriver2.tankFocusDriver_settings(2)
+            tank1_body_layer.camera_image.do(tankFocusDriver2)
 
     # Полёт ракеты
     def push_bullet(self):
@@ -540,6 +577,7 @@ class tankGunAndBulletLayer(ScrollableLayer):
 class TankBodyLayer(ScrollableLayer):
 
     tank_body_image = Sprite("res/bullet.png")
+    camera_image = Sprite("res/camera.png")
 
     def __init__(self, picture, pos, max_speed, min_speed):
 
@@ -552,6 +590,9 @@ class TankBodyLayer(ScrollableLayer):
         self.tank_body_image.max_reverse_speed = min_speed
 
         self.add(self.tank_body_image)
+        self.camera_image = Sprite("res/camera.png")
+        self.add(self.camera_image)
+
 
 #Заполнение функций из библиотеки
 class tank_library_initialize():
@@ -583,7 +624,7 @@ class tank_library_initialize():
 
         if number_of_tank == 1 and move_tank_body_1_code != code:
             tank1_body_layer.tank_body_image.stop()
-            print('it')
+
             move_tank_body_1_code = code
             body_driver = tankBodyDriver()
 
@@ -606,7 +647,6 @@ class tank_library_initialize():
             )
 
             tank1_body_layer.tank_body_image.do(body_driver)
-
             gun_driver = tankGunDriver()
             gun_driver.tankGunDriver_settings(tank1_body_position_x,
                                               tank1_body_position_y,

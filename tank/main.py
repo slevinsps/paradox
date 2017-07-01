@@ -57,7 +57,7 @@ tank1_health = 100
 TANK1_DAMAGE = 20
 
 # Здороваье и урон второго танка
-tank2_health = 100
+tank2_health = 20
 TANK2_DAMAGE = 20
 
 # Урон от столкновения со стенами
@@ -228,7 +228,7 @@ class tankGunDriver(Driver):
             self.target.x = tank1_body_position_x
             self.target.y = tank1_body_position_y
 
-            print(self.target.x, tank1_body_position_x)
+            #print(self.target.x, tank1_body_position_x)
         else:
             global tank2_body_position_x, tank2_body_position_y
             self.target.x = tank2_body_position_x
@@ -320,6 +320,11 @@ class tankBulletDriver(Driver):
                         nickname1_label.do(Acrions.FadeOut(1))
                         health_strip1.do(Acrions.FadeOut(1))
 
+                        final_scene = Scene()
+                        final_scene.add(FinalScene('синий'))
+                        final_scene.add(FinalMenu())
+                        director.run(SlideInLTransition(final_scene, duration=2))
+
                     elif self.number_of_tank == 1 and tank2_health <= 0:
                         tank2_body_layer.stop()
                         tank2_body_layer.tank_body_image.stop()
@@ -335,6 +340,11 @@ class tankBulletDriver(Driver):
                         tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                         nickname2_label.do(Acrions.FadeOut(1))
                         health_strip2.do(Acrions.FadeOut(1))
+
+                        final_scene = Scene()
+                        final_scene.add(FinalScene('красный'))
+                        final_scene.add(FinalMenu())
+                        director.run(SlideInLTransition(final_scene, duration=2))
                     bool_end = 0
 
 # Управление телом первого танка
@@ -384,10 +394,6 @@ class tankBodyDriver (Driver):
                 tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                 bool_border1 = 0
 
-                final_scene = Scene()
-                final_scene.add(FinalScene('синий'))
-                final_scene.add(FinalMenu())
-                director.push(SlideInLTransition(final_scene, duration=2))
             if bool_border1:
                 self.target.x = self.manage_side(1, tank1_gun_layer,
                                                  tank1_body_layer, self.target.x <= 50, 53,self.target.x)
@@ -412,10 +418,6 @@ class tankBodyDriver (Driver):
                 tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                 bool_border2 = 0
 
-                final_scene = Scene()
-                final_scene.add(FinalScene('красный'))
-                final_scene.add(FinalMenu())
-                director.run(SlideInLTransition(final_scene, duration=2))
             if bool_border2:
                 self.target.x = self.manage_side(2, tank2_gun_layer,
                                                  tank2_body_layer, self.target.x <= 50, 53, self.target.x)

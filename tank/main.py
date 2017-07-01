@@ -9,6 +9,7 @@ from cocos.scene import Scene
 import threading
 import math
 import time
+import random
 import cocos.actions as Acrions
 from cocos import draw
 from cocos.text import Label
@@ -439,35 +440,43 @@ class tankBodyDriver (Driver):
                 self.target.y = self.manage_side(2, tank2_gun_layer,
                                                  tank2_body_layer, self.target.y >= 1229, 1226, self.target.y)
 
+        self.determine_hit(self.number_of_tank)
+######################################
 
-    ######################################
-
-    #def determine_hit(self):
-    #    global bool_end, tank1_health, tank2_health, time1,time2
-    #    global tank1_body_position_x, tank1_body_position_y
-    #    global tank2_body_position_x, tank2_body_position_y
-    #    if math.sqrt(abs(tank1_body_position_x - tank2_body_position_x) ** 2 + abs(
-    #                    tank1_body_position_y - tank2_body_position_y) ** 2) <= 36:
-    #        if time2 == time1 == 0:
-    #            time2 = time.clock()
-    #            time1 = time.clock()
-    #
-    #        if time2 - time1 > 1:
-    #            self.push_bullet()
-    #        else:
-    #            time2 = time.clock()
-    #
-    #        self.target.speed = 0
-    #        tank2_health -= WALL_DAMAGE
-    #        tank2_gun_layer.text_health.element.text = str(tank1_health)
-    #        tank1_health -= WALL_DAMAGE
-    #        tank1_gun_layer.text_health.element.text = str(tank1_health)
-    #        tank1_body_layer.tank_body_image.do(
-    #            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
-    #        tank2_body_layer.tank_body_image.do(
-    #            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
-    # ###############################
-
+    def determine_hit(self, number_of_tank):
+        global tank1_health, tank2_health, time1, time2
+        global tank1_body_position_x, tank1_body_position_y
+        global tank2_body_position_x, tank2_body_position_y
+        if math.sqrt(abs(tank1_body_position_x - tank2_body_position_x) ** 2 + abs(
+                        tank1_body_position_y - tank2_body_position_y) ** 2) <= 36:
+            if number_of_tank == 1:
+                tank1_body_layer.tank_body_image.do(
+                    ScaleTo(0, 0.2) + ScaleTo(1, 0.2) + RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20,
+                                                                                                            0.2) + RotateBy(
+                        -20, 0.2) + RotateBy(20, 0.2))
+            if number_of_tank == 2:
+                tank2_body_layer.tank_body_image.do(
+                    ScaleTo(0, 0.2) + ScaleTo(1, 0.2) + RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20,
+                                                                                                            0.2) + RotateBy(
+                        -20, 0.2) + RotateBy(20, 0.2))
+            if number_of_tank == 1:
+                self.target.x = random.randint(60, 1200)
+                self.target.y = random.randint(60, 1200)
+            if number_of_tank == 2:
+                self.target.x = random.randint(60, 1200)
+                self.target.y = random.randint(60, 1200)
+            tank2_health -= WALL_DAMAGE
+            tank1_health -= WALL_DAMAGE
+            # if time2 == time1 == 0:
+            #    time2 = time.clock()
+            #    time1 = time.clock()
+            #
+            # if time2 - time1 > 0.2:
+            #    time2 = time1 = 0
+            #
+            # else:
+            #    time2 = time.clock()
+            ###############################
     def manage_side(self, number_of_tank, tank_gun_layer, tank_body_layer, bool, true, false):
         coordinate = false
         if bool:

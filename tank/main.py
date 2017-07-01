@@ -3,10 +3,10 @@ from cocos.sprite import Sprite
 import sys, os
 from cocos.menu import*
 from cocos.tiles import load
-from cocos.layer import ScrollingManager, ScrollableLayer, ColorLayer
+from cocos.layer import ScrollingManager, ScrollableLayer, ColorLayer, Layer,MultiplexLayer
 from cocos.director import director
 from cocos.scene import Scene
-import threading
+from threading import Timer
 import math
 import time
 import random
@@ -28,6 +28,9 @@ director.init(width=800, height=600, autoscale=False, resizable=True)
 keyboard = key.KeyStateHandler()
 
 scroller = ScrollingManager()
+layer2 = ScrollingManager()
+
+
 
 # Координаты тела первого танка
 tank1_body_position_x = 200
@@ -58,7 +61,7 @@ tank1_health = 100
 TANK1_DAMAGE = 20
 
 # Здороваье и урон второго танка
-tank2_health = 20
+tank2_health = 100
 TANK2_DAMAGE = 20
 
 # Урон от столкновения со стенами
@@ -112,6 +115,10 @@ TANK_HEIGHT = 39
 
 #Размер анимации загрузки
 RELOAD_IMAGE_SIZE = 20
+
+time1 = 0
+time2 = 0
+timer = 15
 
 # Все объекты графического интерфейса, привязанные к танкам, цепляем за класс отрисовки пушки!
 # В драйвере stripDriver закрепляем их координаты
@@ -176,11 +183,21 @@ class stripDriver(Driver):
                                     tank2_health)
             tank2_gun_layer.add(health_strip2)
 
+
             tank2_gun_layer.reload_image.x = tank2_body_position_x + TANK_WIDTH + RELOAD_IMAGE_SIZE
             tank2_gun_layer.reload_image.y = tank2_body_position_y + TANK_HEIGHT
 
             nickname2_label.x = tank2_body_position_x - TANK_WIDTH
             nickname2_label.y = tank2_body_position_y + TANK_HEIGHT + RELOAD_IMAGE_SIZE
+            #tank1_gun_layer.timer_label.x = 300
+
+            #
+            # (-tank1_body_layer.x)
+            #tank1_gun_layer.timer_label.position = tank1_body_layer.tank_body_image.position
+            #print(scroller.world_to_screen(800, 600))
+            #print(scroller.screen_to_world(800, 600))
+
+
 
 # Управление дулом пушки первого тела
 class tankGunDriver(Driver):
@@ -259,6 +276,7 @@ class tankBulletDriver(Driver):
 
     #Управление полётом ракеты первого тела
     def step(self, dt):
+
         global tank1_health, tank1_body_position_x, tank1_body_position_y
         global tank2_health, tank2_body_position_x, tank2_body_position_y
 
@@ -324,7 +342,7 @@ class tankBulletDriver(Driver):
                         final_scene = Scene()
                         final_scene.add(FinalScene('синий'))
                         final_scene.add(FinalMenu())
-                        director.run(FadeTRTransition(final_scene, duration=1))
+                        director.run(FadeTRTransition(final_scene, duration=2))
 
                     elif self.number_of_tank == 1 and tank2_health <= 0:
                         tank2_body_layer.stop()
@@ -345,7 +363,7 @@ class tankBulletDriver(Driver):
                         final_scene = Scene()
                         final_scene.add(FinalScene('красный'))
                         final_scene.add(FinalMenu())
-                        director.run(FadeTRTransition(final_scene, duration=1))
+                        director.run(FadeTRTransition(final_scene, duration=2))
 
                     bool_end = 0
 
@@ -374,6 +392,8 @@ class tankBodyDriver (Driver):
         self.min_speed = min_speed
 
     def step(self, dt):
+        #print(scroller.world_to_screen(800, 600))
+
         global tank1_body_position_x, tank1_body_position_y, tank1_body_rotation, tank1_speed, tank1_health, bool_border1
         global tank2_body_position_x, tank2_body_position_y, tank2_body_rotation, tank2_speed, tank2_health, bool_border2
 
@@ -522,11 +542,19 @@ class tankBodyDriver (Driver):
             self.target.speed = 0
 
 class tankGunAndBulletLayer(ScrollableLayer):
+
     is_event_handler = True
 
     reload_image = Sprite("res/reload.png")
     tank_gun_image = Sprite("res/tank_pushka.png")
     bullet_array = [Sprite("res/bullet.png"), Sprite("res/bullet.png"), Sprite("res/bullet.png")]
+
+    timer_label = Label("60",
+                             font_name="BOLD",
+                             font_size=25,
+                             position=(375, 540),
+                             color=(255, 255, 255, 180))
+
 
     def __init__(self, x, y, health, enemy_health, text_color, number_of_tank, bool):
         super(tankGunAndBulletLayer, self).__init__()
@@ -584,6 +612,7 @@ class tankGunAndBulletLayer(ScrollableLayer):
                     self.reload_animation_launch(tank2_gun_layer)
                     self.push_bullet()
                     time_point2 = time.clock()
+
 
     # Запуск анимации перезагрузки
     def reload_animation_launch(self, tank_gun_layer):
@@ -688,6 +717,7 @@ class strip_canvas(draw.Canvas):
         super(strip_canvas, self).__init__()
         self.x = x
         self.y = y
+
         self.health = health
         self.main_color = main_color
         self.color = color
@@ -912,6 +942,71 @@ class tank_library_initialize():
             tank2_gun_layer.tank_gun_image.do(gun_driver)
 
 
+class TimerDriver(Driver):
+
+    def step(self, dt):
+        super(TimerDriver, self).step(dt)
+
+        global time1, time2,timer, tank1_health,tank2_health
+        if time2 == time1 == 0:
+           time2 = time.clock()
+           time1 = time.clock()
+
+        if time2 - time1 >= 1:
+            timer -= 1
+            if timer < 10:
+                if tank1_gun_layer.timer_label.element.color == (255, 0, 0, 180):
+                    tank1_gun_layer.timer_label.element.color =(255, 255, 255, 180)
+                else:
+                    tank1_gun_layer.timer_label.element.color = (255, 0, 0, 180)
+                l = '0' + str(timer)
+            else:
+                l = str(timer)
+
+            tank1_gun_layer.timer_label.element.text = l
+            if timer == 0:
+
+
+                tank2_body_layer.tank_body_image.do(
+                        ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
+                tank2_body_layer.tank_body_image.do(Acrions.FadeOut(1))
+                tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
+
+                tank1_body_layer.tank_body_image.do(
+                        ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
+                tank1_body_layer.tank_body_image.do(Acrions.FadeOut(1))
+                tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
+
+                final_scene = Scene()
+                final_scene.add(FinalScene('красный'))
+                final_scene.add(FinalMenu())
+                tank1_gun_layer.timer_label.stop()
+                director.run(FadeTRTransition(final_scene, duration=2))
+
+            time2 = time1 = 0
+
+        else:
+           time2 = time.clock()
+
+#class TimerLayer(ScrollableLayer):
+#    timer_label = Label("60",
+#                             font_name="BOLD",
+#                             font_size=25,
+#                             color=(255, 0, 0, 180))
+#    def __init__(self):
+#
+#        super(TimerLayer, self).__init__()
+#        self.timer_label = Label("60",
+#                            font_name="BOLD",
+#                            font_size=25,
+#                            color=(255, 0, 0, 180))
+#        x, y = director.get_window_size()
+#        self.timer_label.position = (x-50,y-50)
+#        self.add(self.timer_label)
+#
+
+
+
 #class driverByFirstUser(Driver):
 #    def step(self, dt):
 #        if(tank1_body_position_y <= tank1_start_y+100):
@@ -997,6 +1092,11 @@ strip_health2_driver = stripDriver()
 strip_health2_driver.stripDriver_settings(2)
 tank2_gun_layer.do(strip_health2_driver)
 
+# Timer
+TimerDriver1 = TimerDriver()
+#TimerLayer.timer_label.do(TimerDriver1)
+
+
 #Обнолвение библиотечных функций
 FirstTankClass.tank_mechanics.move_tank_body = tank_library_initialize.move_tank_body
 FirstTankClass.tank_mechanics.rotate_gun = tank_library_initialize.rotate_gun
@@ -1008,10 +1108,15 @@ FirstTankClass.tank_mechanics.set_nickname = tank_library_initialize.set_nicknam
 tank1_body_layer.do(FirstTankClass.driverByFirstUser())
 tank2_body_layer.do(SecondTankClass.driverBySecondUser())
 
+
+
 #Настройка карты
 map_layer = load("res/road.tmx")["map0"]
 scroller.add(map_layer)
-
+#layer2.add(map_layer)
+#timerLayer1 = TimerLayer()
+#layer2.add(timerLayer1)
+#scroller.add(timerLayer1)
 #Покдючаем танки
 scroller.add(tank1_body_layer)
 scroller.add(tank2_body_layer)
@@ -1019,6 +1124,12 @@ scroller.add(tank1_gun_layer)
 scroller.add(tank2_gun_layer)
 
 scene = Scene(scroller)
+#scene.add(Label("Hello world!", position = (100, 300)))
+tank1_gun_layer.timer_label.do(TimerDriver())
+timer_frame = Sprite("res/timer_frame.png")
+timer_frame.position = (394, 553)
+scene.add(timer_frame)
+scene.add(tank1_gun_layer.timer_label)
 
 director.window.push_handlers(keyboard)
 

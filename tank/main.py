@@ -323,7 +323,7 @@ class tankBulletDriver(Driver):
                         final_scene = Scene()
                         final_scene.add(FinalScene('синий'))
                         final_scene.add(FinalMenu())
-                        director.run(SlideInLTransition(final_scene, duration=2))
+                        director.run(FadeTRTransition(final_scene, duration=1))
 
                     elif self.number_of_tank == 1 and tank2_health <= 0:
                         tank2_body_layer.stop()
@@ -344,7 +344,8 @@ class tankBulletDriver(Driver):
                         final_scene = Scene()
                         final_scene.add(FinalScene('красный'))
                         final_scene.add(FinalMenu())
-                        director.run(SlideInLTransition(final_scene, duration=2))
+                        director.run(FadeTRTransition(final_scene, duration=1))
+
                     bool_end = 0
 
 # Управление телом первого танка
@@ -394,6 +395,11 @@ class tankBodyDriver (Driver):
                 tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                 bool_border1 = 0
 
+                final_scene = Scene()
+                final_scene.add(FinalScene('синий'))
+                final_scene.add(FinalMenu())
+                director.run(FadeTRTransition(final_scene, duration=2))
+
             if bool_border1:
                 self.target.x = self.manage_side(1, tank1_gun_layer,
                                                  tank1_body_layer, self.target.x <= 50, 53,self.target.x)
@@ -417,6 +423,11 @@ class tankBodyDriver (Driver):
                 tank2_body_layer.tank_body_image.do(Acrions.FadeOut(1))
                 tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                 bool_border2 = 0
+
+                final_scene = Scene()
+                final_scene.add(FinalScene('красный'))
+                final_scene.add(FinalMenu())
+                director.run(FadeTRTransition(final_scene, duration=2))
 
             if bool_border2:
                 self.target.x = self.manage_side(2, tank2_gun_layer,

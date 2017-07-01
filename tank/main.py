@@ -1,12 +1,14 @@
 # Imports as usual
 from cocos.sprite import Sprite
+import sys, os
+from cocos.menu import*
 from cocos.tiles import load
-from cocos.layer import ScrollingManager, ScrollableLayer
+from cocos.layer import ScrollingManager, ScrollableLayer, ColorLayer
 from cocos.director import director
 from cocos.scene import Scene
+import threading
 import math
 import time
-import threading
 import cocos.actions as Acrions
 from cocos import draw
 from cocos.text import Label
@@ -15,8 +17,10 @@ from cocos.actions import*
 from pyglet.window import key
 from cocos.director import director
 from cocos.actions import  Rotate, MoveBy, ScaleBy, Flip, Waves3D,RotateTo
+from cocos.scenes.transitions import FadeTRTransition, SlideInLTransition
 import FirstTankClass
 import SecondTankClass
+from FinalScene import FinalScene, FinalMenu
 
 director.init(width=800, height=600, autoscale=False, resizable=True)
 
@@ -379,6 +383,11 @@ class tankBodyDriver (Driver):
                 tank1_body_layer.tank_body_image.do(Acrions.FadeOut(1))
                 tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                 bool_border1 = 0
+
+                final_scene = Scene()
+                final_scene.add(FinalScene('синий'))
+                final_scene.add(FinalMenu())
+                director.push(SlideInLTransition(final_scene, duration=2))
             if bool_border1:
                 self.target.x = self.manage_side(1, tank1_gun_layer,
                                                  tank1_body_layer, self.target.x <= 50, 53,self.target.x)
@@ -402,6 +411,11 @@ class tankBodyDriver (Driver):
                 tank2_body_layer.tank_body_image.do(Acrions.FadeOut(1))
                 tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                 bool_border2 = 0
+
+                final_scene = Scene()
+                final_scene.add(FinalScene('красный'))
+                final_scene.add(FinalMenu())
+                director.run(SlideInLTransition(final_scene, duration=2))
             if bool_border2:
                 self.target.x = self.manage_side(2, tank2_gun_layer,
                                                  tank2_body_layer, self.target.x <= 50, 53, self.target.x)

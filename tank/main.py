@@ -1,5 +1,6 @@
 # Imports as usual
 from cocos.sprite import Sprite
+import pyglet
 import sys, os
 from cocos.menu import*
 from cocos.tiles import load
@@ -305,12 +306,14 @@ class tankBulletDriver(Driver):
 
     #Определение попадания ракеты в танк
     def determine_hit(self):
-        global bool_end, tank1_health, tank2_health
+        global bool_end, tank1_health, tank2_health,bool_border1,bool_border2
 
         if self.bool and bool_end:
             if math.sqrt(abs(self.tank_body_position_x - self.target.x) ** 2 + abs(
                             self.tank_body_position_y - self.target.y) ** 2) <= 20:
-
+                tank1_gun_layer.explosion_image.do(Acrions.FadeIn(0))
+                tank1_gun_layer.explosion_image.position = self.target.position
+                tank1_gun_layer.explosion_image.do(Acrions.FadeOut(0.5))
                 if self.number_of_tank == 1:
                     global tank2_health, bool1
                     tank2_health -= self.tank_damage
@@ -328,13 +331,7 @@ class tankBulletDriver(Driver):
                 self.bool = 0
             if self.tank_health <= 0:
                     if self.number_of_tank == 2 and tank1_health <= 0:
-                        tank1_body_layer.stop()
-                        tank1_body_layer.tank_body_image.stop()
-                        tank1_gun_layer.stop()
-                        tank1_gun_layer.reload_image.stop()
-                        nickname1_label.stop()
-                        tank1_gun_layer.remove(health_strip1)
-                        tank1_gun_layer.remove(tank1_gun_layer.reload_image)
+
 
                         tank1_body_layer.tank_body_image.do(
                             ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
@@ -342,20 +339,14 @@ class tankBulletDriver(Driver):
                         tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                         nickname1_label.do(Acrions.FadeOut(1))
                         health_strip1.do(Acrions.FadeOut(1))
-
+                        bool_border1 = 0
                         final_scene = Scene()
                         final_scene.add(FinalScene('синий'))
                         final_scene.add(FinalMenu())
                         director.run(FadeTRTransition(final_scene, duration=2))
 
                     elif self.number_of_tank == 1 and tank2_health <= 0:
-                        tank2_body_layer.stop()
-                        tank2_body_layer.tank_body_image.stop()
-                        tank2_gun_layer.stop()
-                        tank2_gun_layer.reload_image.stop()
-                        nickname2_label.stop()
-                        tank2_gun_layer.remove(health_strip2)
-                        tank2_gun_layer.remove(tank2_gun_layer.reload_image)
+
 
                         tank2_body_layer.tank_body_image.do(
                             ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
@@ -363,7 +354,7 @@ class tankBulletDriver(Driver):
                         tank2_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
                         nickname2_label.do(Acrions.FadeOut(1))
                         health_strip2.do(Acrions.FadeOut(1))
-
+                        bool_border2 = 0
                         final_scene = Scene()
                         final_scene.add(FinalScene('красный'))
                         final_scene.add(FinalMenu())
@@ -553,6 +544,8 @@ class tankGunAndBulletLayer(ScrollableLayer):
     tank_gun_image = Sprite("res/tank_pushka.png")
     bullet_array = [Sprite("res/bullet.png"), Sprite("res/bullet.png"), Sprite("res/bullet.png")]
 
+    explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))
+
     timer_label = Label("60",
                              font_name="BOLD",
                              font_size=25,
@@ -567,6 +560,7 @@ class tankGunAndBulletLayer(ScrollableLayer):
         #ОБЯЗАТЕЛЬНО ДУБЛИРОВАТЬ СПРАЙТЫ, ИНАЧЕ ДВА ОБЪЕКТЫ ПРЕВРАТЯТСЯ В ОДИН
         self.tank_gun_image = Sprite("res/tank_pushka.png")
         self.reload_image = Sprite("res/reload.png")
+        self.explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))
         self.position_x = x
         self.position_y = y
         self.health = health
@@ -588,6 +582,8 @@ class tankGunAndBulletLayer(ScrollableLayer):
         self.tank_gun_image.x = x
         self.tank_gun_image.y = y
 
+        self.explosion_image.do(Acrions.FadeOut(0))
+        self.add(self.explosion_image)
         self.add(self.tank_gun_image)
         self.add(self.reload_image)
 
@@ -697,6 +693,7 @@ class TankBodyLayer(ScrollableLayer):
 
     tank_body_image = Sprite("res/bullet.png")
     focus_frame = Sprite("res/focus_frame.png")
+
 
     def __init__(self, picture, pos, max_speed, min_speed):
 
@@ -1138,6 +1135,7 @@ timer_frame.position = (394, 553)
 teleport_image = Sprite("res/teleport.png")
 teleport_image.position = (400,300)
 teleport_image.do(Acrions.FadeOut(0))
+
 
 scene.add(teleport_image)
 scene.add(timer_frame)

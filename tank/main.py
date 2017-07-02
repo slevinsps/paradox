@@ -118,7 +118,11 @@ RELOAD_IMAGE_SIZE = 20
 
 time1 = 0
 time2 = 0
-timer = 15
+timer = 60
+
+
+
+
 
 # Все объекты графического интерфейса, привязанные к танкам, цепляем за класс отрисовки пушки!
 # В драйвере stripDriver закрепляем их координаты
@@ -469,15 +473,15 @@ class tankBodyDriver (Driver):
         global tank2_body_position_x, tank2_body_position_y
         if math.sqrt(abs(tank1_body_position_x - tank2_body_position_x) ** 2 + abs(
                         tank1_body_position_y - tank2_body_position_y) ** 2) <= 36:
+
+            teleport_image.do(Acrions.FadeIn(0)+Acrions.FadeOut(1))
             if number_of_tank == 1:
                 tank1_body_layer.tank_body_image.do(
-                    ScaleTo(0, 0.2) + ScaleTo(1, 0.2) + RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20,
-                                                                                                            0.2) + RotateBy(
+                    RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20,0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
             if number_of_tank == 2:
                 tank2_body_layer.tank_body_image.do(
-                    ScaleTo(0, 0.2) + ScaleTo(1, 0.2) + RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20,
-                                                                                                            0.2) + RotateBy(
+                    RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20,0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
             if number_of_tank == 1:
                 self.target.x = random.randint(60, 1200)
@@ -527,7 +531,7 @@ class tankBodyDriver (Driver):
     # Скорость танка
     def change_speed(self):
         if self.key_clicked == '':
-            self.target.acceleration = (keyboard[key.UP] - keyboard[key.DOWN]) * 350
+            self.target.speed = (keyboard[key.UP] - keyboard[key.DOWN]) * 100
         else:
             first_boolean = (self.key_clicked == 'w')
             second_boolean = (self.key_clicked == 's')
@@ -554,6 +558,7 @@ class tankGunAndBulletLayer(ScrollableLayer):
                              font_size=25,
                              position=(375, 540),
                              color=(255, 255, 255, 180))
+
 
 
     def __init__(self, x, y, health, enemy_health, text_color, number_of_tank, bool):
@@ -1124,10 +1129,17 @@ scroller.add(tank1_gun_layer)
 scroller.add(tank2_gun_layer)
 
 scene = Scene(scroller)
-#scene.add(Label("Hello world!", position = (100, 300)))
+
 tank1_gun_layer.timer_label.do(TimerDriver())
 timer_frame = Sprite("res/timer_frame.png")
 timer_frame.position = (394, 553)
+
+
+teleport_image = Sprite("res/teleport.png")
+teleport_image.position = (400,300)
+teleport_image.do(Acrions.FadeOut(0))
+
+scene.add(teleport_image)
 scene.add(timer_frame)
 scene.add(tank1_gun_layer.timer_label)
 

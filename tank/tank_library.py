@@ -1,9 +1,7 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
+class TankMechanics(object):
+    """Библиотека для управления танком"""
 
-
-class tank_mechanics(object):
-    __metaclass__ = ABCMeta
-
+    '''Крайние значения карты'''
     left_down_end_of_map = 50
     right_up_end_of_map = 1200
 
@@ -16,115 +14,120 @@ class tank_mechanics(object):
     tank2_body_position_y_start = 300
 
     '''Стрельба'''
-    @abstractmethod
-    def fire(self = 0):
+    @staticmethod
+    def fire():
+        pass
+
+    '''Автонаведение'''
+    @staticmethod
+    def pointing():
         pass
 
     '''Инвертирование направления движения'''
-    @abstractmethod
-    def invert_moving(self = 0):
+    @staticmethod
+    def invert_moving():
         pass
 
     '''Инвертирование угла поворота корпуса'''
-    @abstractmethod
-    def invert_body_rotating(self = 0):
+    @staticmethod
+    def invert_body_rotating():
         pass
 
     '''Инвертирование угла поворота пушка'''
-    @abstractmethod
-    def invert_gun_rotating(self = 0):
+    @staticmethod
+    def invert_gun_rotating():
         pass
 
     '''Возвращает True, если последний выпущенный снаряд попал в цель. В противном случае вернет False'''
-    @abstractmethod
-    def get_boolean_hit_the_tank(self = 0):
+    @staticmethod
+    def get_boolean_hit_the_tank():
         pass
 
     '''Возвращает True, если танк ещё перезаряжается или False, если танк еще не перезарядился'''
-    @abstractmethod
-    def get_boolean_recharging(self = 0):
+    @staticmethod
+    def get_boolean_recharging():
         pass
 
     '''Возвращает True или False в зависимости, есть ли на вашем танке фокус или нет'''
-    @abstractmethod
-    def get_boolean_focus_on(self = 0):
+    @staticmethod
+    def get_boolean_focus_on():
         pass
 
     '''Поворачивает пушку'''
     '''angle - угол поворота(в градусах), строго больше нуля'''
     '''side - выбор направления вращения. rigtht - по часовой, left - против часовой'''
     '''continued. 0 - повторить действие 1 раз. 1 - постоянное повторение'''
-    @abstractmethod
-    def rotate_gun(angle = 1, side = 'right', continued = 0):
+    @staticmethod
+    def rotate_gun(angle=1, side='right', continued=0):
         pass
 
     '''Сделать угол поворота пушки равным определенному углк'''
-    @abstractmethod
-    def make_gun_angle(angle = 1):
+    @staticmethod
+    def make_gun_angle(angle=1):
         pass
 
     '''Дать имя танку'''
-    @abstractmethod
-    def set_nickname(nickname = 'Tank'):
+    @staticmethod
+    def set_nickname(nickname='Tank'):
         pass
 
     '''Движение танка'''
     '''key - направление движения.w - движение вперёд,s - движение назад'''
     '''speed - скорость движения'''
     '''rotation - угол кривизны движения'''
-    @abstractmethod
-    def move_tank_body(key = '', speed = 0, rotation = 0):
+    @staticmethod
+    def move_tank_body(key='', speed=0, rotation=0):
         pass
 
     '''Останавливает движение'''
     '''t - время стоянки(в секундах)'''
-    @abstractmethod
-    def stop_moving(t = 0):
+    @staticmethod
+    def stop_moving(t=0):
         pass
 
     '''Возвращает координату X положения центра собственного танка'''
-    @abstractmethod
-    def get_x(self = 0):
+    @staticmethod
+    def get_x():
         pass
 
     '''Возвращает координату Y положения центра собственного танка'''
-    @abstractmethod
-    def get_y(self = 0):
+    @staticmethod
+    def get_y():
         pass
 
     '''Возвращает угол поворота корпуса'''
-    @abstractmethod
-    def get_body_angle(self = 0):
+    @staticmethod
+    def get_body_angle():
         pass
 
     '''Возвращает угол поворота пушки'''
-    @abstractmethod
-    def get_gun_angle(self = 0):
+    @staticmethod
+    def get_gun_angle():
         pass
 
     '''Возвращает здоровье танка'''
-    @abstractmethod
-    def get_health(self = 0):
+    @staticmethod
+    def get_health():
         pass
 
     '''Возвращает скорость танка'''
-    @abstractmethod
-    def get_speed(self = 0):
+    @staticmethod
+    def get_speed():
         pass
 
     '''Возвращает координату X положения центра вражеского танка'''
-    @abstractmethod
-    def get_enemy_x(self = 0):
+    @staticmethod
+    def get_enemy_x():
         pass
 
     '''Возвращает координату Y положения центра вражеского танка'''
-    @abstractmethod
-    def get_enemy_y(self = 0):
+    @staticmethod
+    def get_enemy_y():
         pass
 
     '''Возвращает время последнего выстрела противника'''
-    @abstractmethod
-    def get_last_enemy_shot_time(self = 0):
+    @staticmethod
+    def get_last_enemy_shot_time():
         pass
 
 

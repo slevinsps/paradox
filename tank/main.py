@@ -22,7 +22,7 @@ from cocos.actions import  Rotate, MoveBy, ScaleBy, Flip, Waves3D,RotateTo
 from cocos.scenes.transitions import FadeTRTransition, SlideInLTransition
 import FirstTankClass
 import SecondTankClass
-from FinalScene import FinalScene, FinalMenu
+from FinalScene import FinalScene, FinalMenu, FinalBack
 
 director.init(width=800, height=600, autoscale=False, resizable=True)
 
@@ -341,7 +341,8 @@ class tankBulletDriver(Driver):
                         health_strip1.do(Acrions.FadeOut(1))
                         bool_border1 = 0
                         final_scene = Scene()
-                        final_scene.add(FinalScene('синий'))
+                        final_scene.add(FinalBack())
+                        final_scene.add(FinalScene('Выиграл синий танк'))
                         final_scene.add(FinalMenu())
                         director.run(FadeTRTransition(final_scene, duration=2))
 
@@ -356,7 +357,8 @@ class tankBulletDriver(Driver):
                         health_strip2.do(Acrions.FadeOut(1))
                         bool_border2 = 0
                         final_scene = Scene()
-                        final_scene.add(FinalScene('красный'))
+                        final_scene.add(FinalBack())
+                        final_scene.add(FinalScene('Выиграл красный танк'))
                         final_scene.add(FinalMenu())
                         director.run(FadeTRTransition(final_scene, duration=2))
 
@@ -412,7 +414,8 @@ class tankBodyDriver (Driver):
                 bool_border1 = 0
 
                 final_scene = Scene()
-                final_scene.add(FinalScene('синий'))
+                final_scene.add(FinalBack())
+                final_scene.add(FinalScene('Выиграл синий танк'))
                 final_scene.add(FinalMenu())
                 director.run(FadeTRTransition(final_scene, duration=2))
 
@@ -441,7 +444,8 @@ class tankBodyDriver (Driver):
                 bool_border2 = 0
 
                 final_scene = Scene()
-                final_scene.add(FinalScene('красный'))
+                final_scene.add(FinalBack())
+                final_scene.add(FinalScene('Выиграл красный танк'))
                 final_scene.add(FinalMenu())
                 director.run(FadeTRTransition(final_scene, duration=2))
 
@@ -980,7 +984,8 @@ class TimerDriver(Driver):
                 tank1_gun_layer.tank_gun_image.do(Acrions.FadeOut(1))
 
                 final_scene = Scene()
-                final_scene.add(FinalScene('красный'))
+                final_scene.add(FinalBack())
+                final_scene.add(FinalScene('Время вышло. Ничья'))
                 final_scene.add(FinalMenu())
                 tank1_gun_layer.timer_label.stop()
                 director.run(FadeTRTransition(final_scene, duration=2))

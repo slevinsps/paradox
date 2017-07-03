@@ -1,4 +1,4 @@
-from menu import MainMenu, Authors
+from menu import MainMenu, Authors, BackgroundLayer
 from FinalScene import FinalMenu
 from cocos.scene import *
 from cocos.layer import *
@@ -6,8 +6,8 @@ from cocos.layer import *
 
 def main():
     menu_scene = Scene()
-    back_layer = ColorLayer(115, 207, 57, 1000)
-    menu_scene.add(back_layer)
+
+    menu_scene.add(BackgroundLayer())
     menu_scene.add(MultiplexLayer(MainMenu(), Authors(), FinalMenu()))
     director.run(menu_scene)
 

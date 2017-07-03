@@ -27,6 +27,9 @@ class FinalScene(Layer):
 
         text1 = Label("Конец игры", font_name='Oswald', font_size = 25)
         text2 = Label(winner, font_name='Oswald', font_size=25)
+
+
+
         text1.position = director._window_virtual_width / 2 - 90, director._window_virtual_height / 2 + 30
         text2.position = director._window_virtual_width / 2 - 180, director._window_virtual_height / 2 - 20
 

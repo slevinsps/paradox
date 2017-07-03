@@ -100,8 +100,8 @@ set_nickname_1_code = ''
 set_nickname_2_code = ''
 
 # Размеры танка в пикселях
-TANK_WIDTH = 36
-TANK_HEIGHT = 39
+TANK_WIDTH = 73
+TANK_HEIGHT = 70
 
 # Размер анимации загрузки
 RELOAD_IMAGE_SIZE = 20
@@ -178,13 +178,6 @@ class TimerDriver(Driver):
                         ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
                 tank1_body_layer.tank_body_image.do(FadeOut(1))
                 tank1_gun_layer.tank_gun_image.do(FadeOut(1))
-
-                final_scene = Scene()
-                final_scene.add(FinalScene('красный'))
-                final_scene.add(FinalMenu())
-                timer_label.stop()
-                director.run(FadeTRTransition(final_scene, duration=2))
-
             time2 = time1 = 0
 
         else:
@@ -334,11 +327,14 @@ class TankBulletDriver(Driver):
                 global tank2_health, is_hitted1, TANK1_DAMAGE, bool_border2
 
                 if math.sqrt(abs(tank2_body_position_x - self.target.x) ** 2 + abs(
-                                tank2_body_position_y - self.target.y) ** 2) <= 25:
+                                tank2_body_position_y - self.target.y) ** 2) <= 45:
+                    tank1_gun_layer.explosion_image.do(FadeIn(0))
+                    tank1_gun_layer.explosion_image.position = self.target.position
+                    tank1_gun_layer.explosion_image.do(FadeOut(0.5))
                     is_hitted1 = True
                     tank2_health -= TANK1_DAMAGE
                     tank2_body_layer.tank_body_image.do(
-                            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+                        RotateBy(-15, 0.2) + RotateBy(+15, 0.2) + RotateBy(-15, 0.2) + RotateBy(+15, 0.2))
 
                 if tank2_health <= 0:
                     tank2_body_layer.tank_body_image.do(
@@ -349,11 +345,14 @@ class TankBulletDriver(Driver):
                 global tank1_body_position_x, tank1_body_position_y
                 global tank1_health, is_hitted2, TANK2_DAMAGE, bool_border1
                 if math.sqrt(abs(tank1_body_position_x - self.target.x) ** 2 + abs(
-                                tank1_body_position_y - self.target.y) ** 2) <= 25:
+                                tank1_body_position_y - self.target.y) ** 2) <= 45:
+                        tank1_gun_layer.explosion_image.do(FadeIn(0))
+                        tank1_gun_layer.explosion_image.position = self.target.position
+                        tank1_gun_layer.explosion_image.do(FadeOut(0.5))
                         is_hitted2 = True
                         tank1_health -= TANK1_DAMAGE
                         tank1_body_layer.tank_body_image.do(
-                            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+                            RotateBy(-15, 0.2) + RotateBy(+15, 0.2) + RotateBy(-15, 0.2) + RotateBy(+15, 0.2))
 
                 if tank1_health <= 0:
                     TankLibraryInitialize.die(1)
@@ -407,10 +406,10 @@ class TankBodyDriver (Driver):
 
             # Если танк врезался в стенку
             if bool_border1:
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x <= 50, 51, self.target.x)
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x >= 1229, 1228, self.target.x)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y <= 50, 51, self.target.y)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y >= 1229, 1228, self.target.y)
+                self.target.x = self.manage_side(self.number_of_tank, self.target.x <= 60, 61, self.target.x)
+                self.target.x = self.manage_side(self.number_of_tank, self.target.x >= 963, 962, self.target.x)
+                self.target.y = self.manage_side(self.number_of_tank, self.target.y <= 60, 61, self.target.y)
+                self.target.y = self.manage_side(self.number_of_tank, self.target.y >= 835, 834, self.target.y)
 
             # Прикрепляем все танковые объекты к танку
             tank1_body_position_x = self.target.x
@@ -452,10 +451,10 @@ class TankBodyDriver (Driver):
 
             # Если танк врезался в стенку
             if bool_border2:
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x <= 50, 51, self.target.x)
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x >= 1229, 1228, self.target.x)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y <= 50, 51, self.target.y)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y >= 1229, 1228, self.target.y)
+                self.target.x = self.manage_side(self.number_of_tank, self.target.x <= 60, 61, self.target.x)
+                self.target.x = self.manage_side(self.number_of_tank, self.target.x >= 963, 962, self.target.x)
+                self.target.y = self.manage_side(self.number_of_tank, self.target.y <= 60, 61, self.target.y)
+                self.target.y = self.manage_side(self.number_of_tank, self.target.y >= 835, 834, self.target.y)
 
             # Прикрепляем все танковые объекты к танку
             tank2_body_position_x = self.target.x
@@ -501,16 +500,16 @@ class TankBodyDriver (Driver):
                     RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
 
-                self.target.x = random.randint(60, 1200)
-                self.target.y = random.randint(60, 1200)
+                self.target.x = random.randint(75, 900)
+                self.target.y = random.randint(75, 800)
 
             if number_of_tank == 2:
                 tank2_body_layer.tank_body_image.do(
                     RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
 
-                self.target.x = random.randint(60, 1200)
-                self.target.y = random.randint(60, 1200)
+                self.target.x = random.randint(75, 900)
+                self.target.y = random.randint(75, 800)
 
             tank2_health -= WALL_DAMAGE * 5
             tank1_health -= WALL_DAMAGE * 5
@@ -548,7 +547,7 @@ class TankBodyDriver (Driver):
     # Скорость танка
     def change_speed(self, number_of_tank, invert_moving):
         if key_choose == number_of_tank:
-            self.target.acceleration = (keyboard[119] - keyboard[115]) * 100
+            self.target.speed = (keyboard[119] - keyboard[115]) * 100
         else:
             first_boolean = (self.key_clicked == 'w')
             second_boolean = (self.key_clicked == 's')
@@ -573,19 +572,19 @@ class TankGunAndBulletLayer(ScrollableLayer):
     bullet_array = [Sprite("res/bullet.png"), Sprite("res/bullet.png"), Sprite("res/bullet.png")]  # Массив пуль
     explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))  # Анимация взрыва
 
-    def __init__(self):
+    def __init__(self,picture):
         super(TankGunAndBulletLayer, self).__init__()
 
         # ОБЯЗАТЕЛЬНО ДУБЛИРОВАТЬ СПРАЙТЫ, ИНАЧЕ ДВА ОБЪЕКТЫ ПРЕВРАТЯТСЯ В ОДИН
-        self.tank_gun_image = Sprite("res/tank_pushka.png")
+        self.tank_gun_image = Sprite(picture)
         self.whoom_control_image = Sprite("res/robot.png")
-        self.tank_gun_image_copy = Sprite("res/tank_pushka.png")
+        self.tank_gun_image_copy = Sprite(picture)
         self.reload_image = Sprite("res/reload.png")
         self.explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))
 
         self.j = 0
 
-        self.whoom_control_image.do(ScaleBy(0.8, 0))
+
         self.reload_image.do(FadeOut(0))
         self.tank_gun_image_copy.do(FadeOut(0))
         self.explosion_image.do(FadeOut(0))
@@ -708,11 +707,11 @@ class TankGunAndBulletLayer(ScrollableLayer):
                 number_of_tank)
             if number_of_tank == 1:
                 tank1_gun_layer.bullet_array[j].stop()
-                tank1_gun_layer.bullet_array[j].do(FadeOut(1.5))
+                tank1_gun_layer.bullet_array[j].do(FadeOut(0.9))
                 tank1_gun_layer.bullet_array[j].do(bullet_driver)
             else:
                 tank2_gun_layer.bullet_array[j].stop()
-                tank2_gun_layer.bullet_array[j].do(FadeOut(1.5))
+                tank2_gun_layer.bullet_array[j].do(FadeOut(0.9))
                 tank2_gun_layer.bullet_array[j].do(bullet_driver)
 
             j += 1
@@ -864,14 +863,14 @@ class StripCanvas(draw.Canvas):
     def full_life(self):
         global TANK_HEIGHT, TANK_WIDTH
         self.set_color(self.color)
-        self.move_to((-TANK_WIDTH*3/4, TANK_HEIGHT))
-        self.line_to((-TANK_WIDTH*3/4 + 100 / 2, TANK_HEIGHT))
+        self.move_to((-TANK_WIDTH/2.5, TANK_HEIGHT))
+        self.line_to((-TANK_WIDTH/2.5 + 100 / 2, TANK_HEIGHT))
 
     def real_life(self):
         global TANK_HEIGHT, TANK_WIDTH
         self.set_color(self.main_color)
-        self.move_to((-TANK_WIDTH*3/4, TANK_HEIGHT))
-        self.line_to((-TANK_WIDTH*3/4 + self.health / 2, TANK_HEIGHT))
+        self.move_to((-TANK_WIDTH/2.5, TANK_HEIGHT))
+        self.line_to((-TANK_WIDTH/2.5 + self.health / 2, TANK_HEIGHT))
 
 
 # Заполнение функций из библиотеки
@@ -1419,15 +1418,18 @@ class TankLibraryInitialize(TankMechanics):
             nickname2_label.do(FadeOut(1))
             health_strip2.do(FadeOut(1))
 
-            name = 'танк названием "' + nickname1_label.element.text + '"'
+            name = 'танк под названием "' + nickname1_label.element.text + '"' + " победил"
+
             bool_border2 = 0
 
         # Запуск финальной сцены
+        name = 1
         final_scene = Scene()
-        final_scene.add(FinalScene(name))
         final_scene.add(FinalBack())
+        final_scene.add(FinalScene(name))
         final_scene.add(FinalMenu())
         director.replace(FadeTRTransition(final_scene, duration=2))
+
 
 # Создание класса корпуса первого танка
 tank1_body_layer = TankBodyLayer(
@@ -1444,8 +1446,8 @@ tank2_body_layer = TankBodyLayer(
     TANK2_MAX_REVERSE_SPEED)
 
 # Создание классов пушек
-tank1_gun_layer = TankGunAndBulletLayer()
-tank2_gun_layer = TankGunAndBulletLayer()
+tank1_gun_layer = TankGunAndBulletLayer("res/tank_pushka.png")
+tank2_gun_layer = TankGunAndBulletLayer("res/tank_pushka2.png")
 
 # Установка названия первого танка
 nickname1_label = Label("Tank1",
@@ -1509,6 +1511,7 @@ TankLibraryInitialize.connect2(1)
 
 # Настройка карты
 map_layer = load("res/road.tmx")["map0"]
+
 scroller.add(map_layer)
 
 keyListener = KeyListener()

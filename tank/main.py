@@ -5,6 +5,7 @@ from cocos.scene import Scene
 import math
 import time
 import random
+import threading
 import pyglet
 from cocos import draw
 from ctypes import *
@@ -15,8 +16,6 @@ from pyglet.window import key
 from cocos.director import director
 from cocos.scenes.transitions import FadeTRTransition
 from cocos.actions import Rotate, ScaleBy, RotateTo
-import FirstTankClass  # Класс управления первого пользователя
-import SecondTankClass  # Класс управления второго пользователя
 import inspect  # Стек функций, нужен, чтобы определить, какая функция какую функцию вызывает
 from FinalScene import FinalScene, FinalMenu, FinalBack
 
@@ -728,6 +727,8 @@ class KeyListener(ScrollableLayer):
     def on_key_press(key_click, modifiers):
         global tank1_body_position_x, tank1_body_position_y, key_choose, focus_on
 
+        # print(key_click)
+
         # Клавиша пробел
         if key_click == 32 :
             if key_choose == 1:
@@ -779,6 +780,19 @@ class KeyListener(ScrollableLayer):
 
             tank1_body_layer.focus_frame.do(FadeOut(0))
             tank2_body_layer.focus_frame.do(FadeIn(0))
+
+        # Клавиша 'V'
+        if key_click == 118 and key_choose != 3:
+
+            move_tank_body_2_code = ''
+            rotate_gun_2_code = ''
+            key_choose = 3
+
+            KeyListener.delete_and_load_image("res/man.png", "res/man.png")
+
+            TankLibraryInitialize.stop_all()
+            TankLibraryInitialize.connect2()
+            TankLibraryInitialize.connect1()
 
         # Клавиша 'C'
         if key_click == 99 and key_choose != 0:
@@ -1156,6 +1170,7 @@ class TankLibraryInitialize(TankMechanics):
 
         if (number_of_tank == 1) and (move_tank_body_1_code != code) and (time.clock() > stop_time1):
 
+            print('ready')
             tank1_body_layer.tank_body_image.stop()
             move_tank_body_1_code = code
             body_driver = TankBodyDriver()
@@ -1479,6 +1494,22 @@ health_strip2 = StripCanvas(
     tank2_health)
 tank2_gun_layer.add(health_strip2)
 
+TankLibraryInitialize.connect1(0)
+TankLibraryInitialize.connect2(0)
+
+# class driverByFirstUser(Driver):
+#    def step(self, dt):
+#        if(tank1_body_position_y <= tank1_start_y+100):
+#           tank_library_initialize.move_tank_body('w', 70, 0, 1)
+#        if(tank1_body_position_y >= 300):
+#            tank_library_initialize.move_tank_body('w', -70, 0, 1)
+#            tank_library_initialize.rotate_gun(115, 'right', 1)
+#
+#class driverBySecondUser(Driver):
+#    def step(self, dt):
+#        tank_library_initialize.move_tank_body('w', 20, 30, 2
+#        tank_library_initialize.rotate_gun(15, 'right', 2)
+
 # Обновление библиотечных функций
 TankMechanics.move_tank_body = TankLibraryInitialize.move_tank_body
 TankMechanics.rotate_gun = TankLibraryInitialize.rotate_gun
@@ -1503,9 +1534,55 @@ TankMechanics.get_last_enemy_shot_time = TankLibraryInitialize.get_last_enemy_sh
 TankMechanics.make_gun_angle = TankLibraryInitialize.make_gun_angle
 TankMechanics.pointing = TankLibraryInitialize.pointing
 
+import FirstTankClass  # Класс управления первого пользователя
+import SecondTankClass  # Класс управления второго пользователя
+
+#i_work1 = 0
+#i_work2 = 0
+#class driverByFirstUser(Driver):
+ #   def settings_it(self, t = time.clock()):
+ #       self.time = t + 1
+ #   def step(self, dt):
+ #       global i_work1, i_work2
+ #       #print(self.time, time.clock())
+ #       #if self.time <= time.clock():
+ #           #self.time = time.clock() + 1
+ #           FirstTankClass.driverByFirstUser.strategy2(TankLibraryInitialize)
+#
+# class driverBySecondtUser(Driver):
+ #   def settings_it(self, t = time.clock()):
+ #       self.time = t + 1
+ #   def step(self, dt):
+ #       #print(self.time, time.clock())
+ #       #if self.time <= time.clock():
+ #       #    self.time = time.clock() + 1
+ #           SecondTankClass.driverBySecondUser.strategy3(TankLibraryInitialize)
+
+#first = FirstTankClass
+#first.move_tank_body = TankLibraryInitialize.move_tank_body
+#first.rotate_gun = TankLibraryInitialize.rotate_gun
+
 # Подключение драйверов разработчиков
-TankLibraryInitialize.connect1(1)
-TankLibraryInitialize.connect2(1)
+#driver1 = driverByFirstUser()
+#driver1.settings_it()
+#tank1_body_layer.do(driver1)
+
+#driver2 = driverBySecondtUser()
+#driver2.settings_it()
+#tank1_body_layer.do(driver2)
+
+#TankLibraryInitialize.connect2(1)
+
+def connect_users():
+    while True:
+        print('www')
+        FirstTankClass.driverByFirstUser.strategy2(TankLibraryInitialize)
+        #time.sleep(0.4)
+        SecondTankClass.driverBySecondUser.strategy3(TankLibraryInitialize)
+        #time.sleep(0.4)
+t = threading.Thread(target=connect_users)
+#t.daemon = True
+t.start()
 
 # Настройка карты
 map_layer = load("res/road.tmx")["map0"]

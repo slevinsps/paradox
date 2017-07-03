@@ -1,9 +1,11 @@
 import math
+import time
 from tank_library import*
 from cocos.actions import Driver
 
 class driverByFirstUser(Driver):
     def step(self, dt):
+        #print(time.clock(),dt)
         driverByFirstUser.strategy2()
 
     def strategy1(self = 0):
@@ -15,20 +17,33 @@ class driverByFirstUser(Driver):
             TankMechanics.move_tank_body('w', 70, -60)
             TankMechanics.fire()
 
-    def strategy2(self=0):
-        TankMechanics.set_nickname('Екатерина')
-        if TankMechanics.get_y() >= TankMechanics.right_up_end_of_map:
-            TankMechanics.move_tank_body('w', -80)
-        elif TankMechanics.get_y() <= TankMechanics.left_down_end_of_map:
-            TankMechanics.move_tank_body('w', 80)
-        if TankMechanics.get_speed() == 0:
-            TankMechanics.move_tank_body('w', 80)
-        angle = math.degrees(math.atan((TankMechanics.get_enemy_y() - TankMechanics.get_y())/
-                          (TankMechanics.get_enemy_x() - TankMechanics.get_x())))
+    def move_tank_body(key='', speed=0, rotation=0):
+        pass
+
+    def rotate_gun(angle=1, side='right', continued=0):
+        pass
+
+    @staticmethod
+    def strategy3(s):
+        s.move_tank_body('w', 80)
+        s.rotate_gun(1, 'right')
+
+    @staticmethod
+    def strategy2(seeel):
+        #seeel.set_nickname('Екатерина')
+        if seeel.get_y() >= 50:
+            seeel.move_tank_body('w', -80)
+        elif seeel.get_y() <= 1200:
+            seeel.move_tank_body('w', 80)
+        if seeel.get_speed() == 0:
+            seeel.move_tank_body('w', 80)
+        angle = math.degrees(math.atan((seeel.get_enemy_y() - seeel.get_y())/
+                          (seeel.get_enemy_x() - seeel.get_x())))
         #print(TankMechanics.pointing())
         driverByFirstUser.determine_angle(angle)
-        TankMechanics.fire()
+        seeel.fire()
 
+    @staticmethod
     def determine_angle(angle):
         if ((TankMechanics.get_enemy_x() - TankMechanics.get_x() > 0) and
             (TankMechanics.get_enemy_y() - TankMechanics.get_y() > 0)):

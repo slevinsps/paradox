@@ -59,11 +59,11 @@ tank1_gun_rotation = 0
 tank2_gun_rotation = 0
 
 # Здороваье и урон первого танка
-tank1_health = 1000
+tank1_health = 100
 TANK1_DAMAGE = 10
 
 # Здороваье и урон второго танка
-tank2_health = 1000
+tank2_health = 100
 TANK2_DAMAGE = 10
 
 # Урон от столкновения со стенами
@@ -82,7 +82,8 @@ TANK2_MAX_FORWARD_SPEED = 200
 TANK2_MAX_REVERSE_SPEED = -100
 
 # Скорость перезарядки
-RECHARGING_SPEED = 1
+RECHARGING_SPEED1 = 1
+RECHARGING_SPEED2 = 1
 
 # Максимальная скорость движения ракеты
 BULLET_MAX_SPEED = 700
@@ -385,6 +386,7 @@ class TankBulletDriver(Driver):
 
 # Управление телом
 class TankBodyDriver (Driver):
+
     # Настройка класса(выбор к какому танку подключается драйвер)
     def tank_body_driver_setting(
             self,
@@ -408,10 +410,12 @@ class TankBodyDriver (Driver):
         self.min_speed = min_speed
 
     def step(self, dt):
+
         global tank1_body_position_x, tank1_body_position_y, tank1_body_rotation, tank1_speed, tank1_health
         global tank2_body_position_x, tank2_body_position_y, tank2_body_rotation, tank2_speed, tank2_health
         global focus_on, bool_border1, bool_border2
-
+        print(tank1_health)
+        print(tank2_health)
         super(TankBodyDriver, self).step(dt)
 
         # Обновление фокуса
@@ -662,7 +666,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
                     position_x,
                     position_y)
             else:
-                if time.clock() - last_tank1_shot_time > RECHARGING_SPEED:
+                if time.clock() - last_tank1_shot_time > RECHARGING_SPEED1:
                     TankGunAndBulletLayer.reload_animation_launch(tank1_gun_layer)
                     is_hitted1 = False
                     j = TankGunAndBulletLayer.push_bullet(
@@ -688,7 +692,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
                     position_x,
                     position_y)
             else:
-                if time.clock() - last_tank2_shot_time > RECHARGING_SPEED:
+                if time.clock() - last_tank2_shot_time > RECHARGING_SPEED2:
                     TankGunAndBulletLayer.reload_animation_launch(tank2_gun_layer)
                     is_hitted2 = False
                     j = TankGunAndBulletLayer.push_bullet(
@@ -708,7 +712,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
     def reload_animation_launch(tank_gun_layer):
         tank_gun_layer.reload_image.do(FadeIn(0))
         tank_gun_layer.reload_image.do(Rotate(360, 1))
-        tank_gun_layer.reload_image.do(FadeOut(RECHARGING_SPEED))
+        tank_gun_layer.reload_image.do(FadeOut(1))
 
     # Полёт ракеты
     @staticmethod
@@ -1529,19 +1533,7 @@ class ConnectionClass():
         thread_for_both_users = threading.Thread(target=ConnectionClass.connect_users)
         thread_for_both_users.start()
 
-# Создание класса корпуса первого танка
-tank1_body_layer = TankBodyLayer(
-    "res/tank_telo.png",
-    (tank1_body_position_x, tank1_body_position_y),
-    TANK1_MAX_FORWARD_SPEED,
-    TANK1_MAX_REVERSE_SPEED)
 
-# Создание класса корпуса второго танка
-tank2_body_layer = TankBodyLayer(
-    "res/tank_telo2.png",
-    (tank2_body_position_x, tank2_body_position_y),
-    TANK2_MAX_FORWARD_SPEED,
-    TANK2_MAX_REVERSE_SPEED)
 
 try:
     nick1 = FirstTankClass.name
@@ -1553,13 +1545,73 @@ try:
 except AttributeError:
     nick2 = 'Танк2'
 
-# Создание классов пушек
-tank1_gun_layer = TankGunAndBulletLayer(nick1,
+
+if FirstTankClass.model == 'heavy':
+    # Создание класса корпуса первого танка
+    TANK1_DAMAGE = 8
+    TANK1_MAX_FORWARD_SPEED = 80
+    TANK1_MAX_REVERSE_SPEED = -40
+    RECHARGING_SPEED1 = 2
+
+    tank1_body_layer = TankBodyLayer(
+        "res/tank_heavy_telo.png",
+        (tank1_body_position_x, tank1_body_position_y),
+        TANK1_MAX_FORWARD_SPEED,
+        TANK1_MAX_REVERSE_SPEED)
+    # Создание классов пушек
+    tank1_gun_layer = TankGunAndBulletLayer(nick1,
+                                            (255, 0, 0, 255),
+                                            "res/tank_heavy_pushka.png")
+elif FirstTankClass.model == 'light':
+    # Создание класса корпуса первого танка
+    TANK1_DAMAGE = 2
+    TANK1_MAX_FORWARD_SPEED = 100
+    TANK1_MAX_REVERSE_SPEED = -60
+    RECHARGING_SPEED2 = 0.5
+
+    tank1_body_layer = TankBodyLayer(
+        "res/tank_light_telo.png",
+        (tank1_body_position_x, tank1_body_position_y),
+        TANK1_MAX_FORWARD_SPEED,
+        TANK1_MAX_REVERSE_SPEED)
+
+    tank1_gun_layer = TankGunAndBulletLayer(nick1,
                                         (255, 0, 0, 255),
-                                        "res/tank_pushka.png")
-tank2_gun_layer = TankGunAndBulletLayer(nick2,
+                                        "res/tank_light_pushka.png")
+
+
+if SecondTankClass.model == 'heavy':
+    # Создание класса корпуса первого танка
+    TANK2_DAMAGE = 8
+    TANK2_MAX_FORWARD_SPEED = 80
+    TANK2_MAX_REVERSE_SPEED = -40
+    RECHARGING_SPEED2 = 2
+    # Создание класса корпуса второго танка
+    tank2_body_layer = TankBodyLayer(
+        "res/tank_heavy_telo2.png",
+        (tank2_body_position_x, tank2_body_position_y),
+        TANK2_MAX_FORWARD_SPEED,
+        TANK2_MAX_REVERSE_SPEED)
+    tank2_gun_layer = TankGunAndBulletLayer(nick2,
                                         (0, 0, 255, 255),
-                                        "res/tank_pushka2.png")
+                                        "res/tank_heavy_pushka2.png")
+elif SecondTankClass.model == 'light':
+    # Создание класса корпуса первого танка
+    TANK2_DAMAGE = 2
+    TANK2_MAX_FORWARD_SPEED = 100
+    TANK2_MAX_REVERSE_SPEED = -60
+    RECHARGING_SPEED2 = 0.5
+
+    tank2_body_layer = TankBodyLayer(
+        "res/tank_light_telo2.png",
+        (tank2_body_position_x, tank2_body_position_y),
+        TANK2_MAX_FORWARD_SPEED,
+        TANK2_MAX_REVERSE_SPEED)
+
+    tank2_gun_layer = TankGunAndBulletLayer(nick2,
+                                        (0, 0, 255, 255),
+                                        "res/tank_light_pushka2.png")
+
 
 # Полоска жизней первого танка и её настройка
 health_strip1 = StripCanvas(
@@ -1630,4 +1682,4 @@ scene.add(timer_label)
 
 director.window.push_handlers(keyboard)
 
-#director.run(scene)
+director.run(scene)

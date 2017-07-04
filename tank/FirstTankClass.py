@@ -18,9 +18,10 @@ def strategy3(self):
 #name = 'Екатерина' 2.0
 
 name = 'Елизавета' #3.0
+model = 'light' #3.0
 
 def strategy(functions):
-    print(functions.get_x(), functions.get_y())
+    #print(functions.get_x(), functions.get_y())
 
     if functions.get_y() <= 100:
         if functions.get_x() > 200 and functions.get_x() < 800 :

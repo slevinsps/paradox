@@ -2,6 +2,7 @@ from cocos.sprite import Sprite
 from cocos.tiles import load
 from cocos.layer import ScrollingManager, ScrollableLayer
 from cocos.scene import Scene
+import os
 import math
 import time
 import random
@@ -616,10 +617,17 @@ class TankGunAndBulletLayer(ScrollableLayer):
     def __init__(self, name, that_color, picture):
         super(TankGunAndBulletLayer, self).__init__()
 
-        self.whoom_control_image = Sprite("res/robot.png")
+        script_dir = os.path.dirname(__file__)
+        path = os.path.join(script_dir, 'res/robot.png')
+        image = pyglet.image.load(path)
+        self.whoom_control_image = Sprite(image)
         self.tank_gun_image = Sprite(picture)
         self.tank_gun_image_copy = Sprite(picture)
-        self.reload_image = Sprite("res/reload.png")
+
+        script_dir = os.path.dirname(__file__)
+        path = os.path.join(script_dir, 'res/reload.png')
+        image = pyglet.image.load(path)
+        self.reload_image = Sprite(image)
         self.explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))
 
         self.j = 0
@@ -633,7 +641,10 @@ class TankGunAndBulletLayer(ScrollableLayer):
         self.tank_gun_image_copy.do(FadeOut(0))
         self.explosion_image.do(FadeOut(0))
 
-        self.bullet_array = [Sprite("res/bullet.png"), Sprite("res/bullet.png"), Sprite("res/bullet.png")]
+        script_dir = os.path.dirname(__file__)
+        path = os.path.join(script_dir, 'res/bullet.png')
+        image = pyglet.image.load(path)
+        self.bullet_array = [Sprite(image), Sprite(image), Sprite(image)]
 
         for i in range(len(self.bullet_array)):
             self.bullet_array[i].do(FadeOut(0))
@@ -896,7 +907,10 @@ class TankBodyLayer(ScrollableLayer):
         super(TankBodyLayer, self).__init__()
 
         self.tank_body_image = Sprite(picture)
-        self.focus_frame = Sprite("res/focus_frame.png")
+        script_dir = os.path.dirname(__file__)
+        path = os.path.join(script_dir, 'res/focus_frame.png')
+        image = pyglet.image.load(path)
+        self.focus_frame = Sprite(image)
         self.tank_body_image.position = pos
         self.focus_frame.position = pos
 
@@ -1580,15 +1594,21 @@ elif model1 == 'light':
     TANK1_MAX_REVERSE_SPEED = -60
     RECHARGING_SPEED2 = 0.5
 
+    script_dir = os.path.dirname(__file__)
+    path = os.path.join(script_dir, 'res/tank_light_telo.png')
+    image = pyglet.image.load(path)
     tank1_body_layer = TankBodyLayer(
-        "res/tank_light_telo.png",
+        image,
         (tank1_body_position_x, tank1_body_position_y),
         TANK1_MAX_FORWARD_SPEED,
         TANK1_MAX_REVERSE_SPEED)
 
+    script_dir = os.path.dirname(__file__)
+    path = os.path.join(script_dir, 'res/tank_light_pushka.png')
+    image = pyglet.image.load(path)
     tank1_gun_layer = TankGunAndBulletLayer(nick1,
                                         (255, 0, 0, 255),
-                                        "res/tank_light_pushka.png")
+                                        image)
 
 
 if model2 == 'heavy':
@@ -1613,15 +1633,21 @@ elif model2 == 'light':
     TANK2_MAX_REVERSE_SPEED = -60
     RECHARGING_SPEED2 = 0.5
 
+    script_dir = os.path.dirname(__file__)
+    path = os.path.join(script_dir, 'res/tank_light_telo2.png')
+    image = pyglet.image.load(path)
     tank2_body_layer = TankBodyLayer(
-        "res/tank_light_telo2.png",
+        image,
         (tank2_body_position_x, tank2_body_position_y),
         TANK2_MAX_FORWARD_SPEED,
         TANK2_MAX_REVERSE_SPEED)
 
+    script_dir = os.path.dirname(__file__)
+    path = os.path.join(script_dir, 'res/tank_light_pushka2.png')
+    image = pyglet.image.load(path)
     tank2_gun_layer = TankGunAndBulletLayer(nick2,
                                         (0, 0, 255, 255),
-                                        "res/tank_light_pushka2.png")
+                                        image)
 
 
 # Полоска жизней первого танка и её настройка
@@ -1680,10 +1706,17 @@ timer_label = Label(
     position=(375, 540),
     color=(255, 255, 255, 180))
 timer_label.do(TimerDriver())
-timer_frame = Sprite("res/timer_frame.png")
+script_dir = os.path.dirname(__file__)
+path = os.path.join(script_dir, 'res/timer_frame.png')
+image = pyglet.image.load(path)
+timer_frame = Sprite(image)
 timer_frame.position = (394, 553)
 
-teleport_image = Sprite("res/teleport.png")
+
+script_dir = os.path.dirname(__file__)
+path = os.path.join(script_dir, 'res/teleport.png')
+image = pyglet.image.load(path)
+teleport_image = Sprite(image)
 teleport_image.position = (400, 300)
 teleport_image.do(FadeOut(0))
 
@@ -1693,4 +1726,4 @@ scene.add(timer_label)
 
 director.window.push_handlers(keyboard)
 
-director.run(scene)
+#director.run(scene)

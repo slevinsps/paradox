@@ -18,11 +18,6 @@ class TankMechanics(object):
     def fire():
         pass
 
-    '''Автонаведение'''
-    @staticmethod
-    def pointing():
-        pass
-
     '''Инвертирование направления движения'''
     @staticmethod
     def invert_moving():
@@ -61,14 +56,19 @@ class TankMechanics(object):
     def rotate_gun(angle=1, side='right', continued=0):
         pass
 
-    '''Сделать угол поворота пушки равным определенному углк'''
+    '''Узнать расстояние между танками'''
     @staticmethod
-    def make_gun_angle(angle=1):
+    def get_distance_between_tanks():
         pass
 
-    '''Дать имя танку'''
+    '''Определить угол между танками'''
     @staticmethod
-    def set_nickname(nickname='Tank'):
+    def determine_angle():
+        pass
+
+    '''Сделать угол поворота пушки равным определенному углу'''
+    @staticmethod
+    def make_gun_angle(angle=1):
         pass
 
     '''Движение танка'''

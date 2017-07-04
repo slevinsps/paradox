@@ -5,6 +5,7 @@ from cocos.scene import Scene
 import math
 import time
 import random
+import threading
 import pyglet
 from cocos import draw
 from ctypes import *
@@ -36,6 +37,19 @@ tank2_body_position_x = 400
 tank2_body_position_y = 300
 tank2_body_rotation = 0
 
+# Крайние значения карты
+LEFT_DOWN_END_OF_MAP = 60
+UP_END_OF_MAP = 835
+RIGHT_END_OF_MAP = 963
+
+# Начальные координаты тела первого танка
+tank1_body_position_x_start = 250
+tank1_body_position_y_start = 150
+
+# Начальные координаты тела второго танка
+tank2_body_position_x_start = 400
+tank2_body_position_y_start = 300
+
 # Максимальные углы поворота корпуса и орудия
 TANK_MAX_ANGLE_OF_BODY_ROTATION = 30
 TANK_MAX_ANGLE_OF_GUN_ROTATION = 155
@@ -45,11 +59,11 @@ tank1_gun_rotation = 0
 tank2_gun_rotation = 0
 
 # Здороваье и урон первого танка
-tank1_health = 100
+tank1_health = 1000
 TANK1_DAMAGE = 10
 
 # Здороваье и урон второго танка
-tank2_health = 100
+tank2_health = 1000
 TANK2_DAMAGE = 10
 
 # Урон от столкновения со стенами
@@ -66,6 +80,9 @@ TANK1_MAX_REVERSE_SPEED = -100
 # Максимальная и минимальаня скорости движения второго танка
 TANK2_MAX_FORWARD_SPEED = 200
 TANK2_MAX_REVERSE_SPEED = -100
+
+# Скорость перезарядки
+RECHARGING_SPEED = 1
 
 # Максимальная скорость движения ракеты
 BULLET_MAX_SPEED = 700
@@ -94,10 +111,6 @@ move_tank_body_2_code = ''
 # Уникальные коды rotate_gun
 rotate_gun_1_code = ''
 rotate_gun_2_code = ''
-
-# Уникальные коды set_nickname
-set_nickname_1_code = ''
-set_nickname_2_code = ''
 
 # Размеры танка в пикселях
 TANK_WIDTH = 73
@@ -140,6 +153,11 @@ time1 = 0
 time2 = 0
 timer = 60
 
+# Отключение потоков управления
+disconnect = 0
+disconnect1 = 0
+disconnect2 = 0
+
 # Все объекты графического интерфейса, привязанные к танкам, цепляем за класс отрисовки пушки!
 # В драйвере stripDriver закрепляем их координаты
 
@@ -178,6 +196,13 @@ class TimerDriver(Driver):
                         ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
                 tank1_body_layer.tank_body_image.do(FadeOut(1))
                 tank1_gun_layer.tank_gun_image.do(FadeOut(1))
+
+                final_scene = Scene()
+                final_scene.add(FinalScene('Ничья'))
+                final_scene.add(FinalMenu())
+                timer_label.stop()
+                director.run(FadeTRTransition(final_scene, duration=2))
+
             time2 = time1 = 0
 
         else:
@@ -328,13 +353,13 @@ class TankBulletDriver(Driver):
 
                 if math.sqrt(abs(tank2_body_position_x - self.target.x) ** 2 + abs(
                                 tank2_body_position_y - self.target.y) ** 2) <= 45:
-                    tank1_gun_layer.explosion_image.do(FadeIn(0))
-                    tank1_gun_layer.explosion_image.position = self.target.position
-                    tank1_gun_layer.explosion_image.do(FadeOut(0.5))
+                    tank2_gun_layer.explosion_image.do(FadeIn(0))
+                    tank2_gun_layer.explosion_image.position = self.target.position
+                    tank2_gun_layer.explosion_image.do(FadeOut(0.5))
                     is_hitted1 = True
                     tank2_health -= TANK1_DAMAGE
                     tank2_body_layer.tank_body_image.do(
-                        RotateBy(-15, 0.2) + RotateBy(+15, 0.2) + RotateBy(-15, 0.2) + RotateBy(+15, 0.2))
+                            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
 
                 if tank2_health <= 0:
                     tank2_body_layer.tank_body_image.do(
@@ -345,14 +370,14 @@ class TankBulletDriver(Driver):
                 global tank1_body_position_x, tank1_body_position_y
                 global tank1_health, is_hitted2, TANK2_DAMAGE, bool_border1
                 if math.sqrt(abs(tank1_body_position_x - self.target.x) ** 2 + abs(
-                                tank1_body_position_y - self.target.y) ** 2) <= 45:
-                        tank1_gun_layer.explosion_image.do(FadeIn(0))
-                        tank1_gun_layer.explosion_image.position = self.target.position
-                        tank1_gun_layer.explosion_image.do(FadeOut(0.5))
-                        is_hitted2 = True
-                        tank1_health -= TANK1_DAMAGE
-                        tank1_body_layer.tank_body_image.do(
-                            RotateBy(-15, 0.2) + RotateBy(+15, 0.2) + RotateBy(-15, 0.2) + RotateBy(+15, 0.2))
+                                tank1_body_position_y - self.target.y) ** 2) <= 25:
+                    tank1_gun_layer.explosion_image.do(FadeIn(0))
+                    tank1_gun_layer.explosion_image.position = self.target.position
+                    tank1_gun_layer.explosion_image.do(FadeOut(0.5))
+                    is_hitted2 = True
+                    tank1_health -= TANK1_DAMAGE
+                    tank1_body_layer.tank_body_image.do(
+                        RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
 
                 if tank1_health <= 0:
                     TankLibraryInitialize.die(1)
@@ -406,10 +431,21 @@ class TankBodyDriver (Driver):
 
             # Если танк врезался в стенку
             if bool_border1:
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x <= 60, 61, self.target.x)
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x >= 963, 962, self.target.x)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y <= 60, 61, self.target.y)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y >= 835, 834, self.target.y)
+                self.target.x = self.manage_side(self.number_of_tank,
+                                                 self.target.x <= LEFT_DOWN_END_OF_MAP,
+                                                 LEFT_DOWN_END_OF_MAP + 1,
+                                                 self.target.x)
+                self.target.x = self.manage_side(self.number_of_tank,
+                                                 self.target.x >= RIGHT_END_OF_MAP,
+                                                 RIGHT_END_OF_MAP - 1,
+                                                 self.target.x)
+                self.target.y = self.manage_side(self.number_of_tank,
+                                                 self.target.y <= LEFT_DOWN_END_OF_MAP,
+                                                 LEFT_DOWN_END_OF_MAP + 1, self.target.y)
+                self.target.y = self.manage_side(self.number_of_tank,
+                                                 self.target.y >= UP_END_OF_MAP,
+                                                 UP_END_OF_MAP - 1,
+                                                 self.target.y)
 
             # Прикрепляем все танковые объекты к танку
             tank1_body_position_x = self.target.x
@@ -433,8 +469,8 @@ class TankBodyDriver (Driver):
             tank1_gun_layer.reload_image.x = self.target.x + TANK_WIDTH + RELOAD_IMAGE_SIZE
             tank1_gun_layer.reload_image.y = self.target.y + TANK_HEIGHT
 
-            nickname1_label.x = self.target.x - TANK_WIDTH
-            nickname1_label.y = self.target.y + TANK_HEIGHT + RELOAD_IMAGE_SIZE
+            tank1_gun_layer.nickname_label.x = self.target.x - TANK_WIDTH
+            tank1_gun_layer.nickname_label.y = self.target.y + TANK_HEIGHT + RELOAD_IMAGE_SIZE
 
             tank1_body_rotation = self.target.rotation
             tank1_speed = self.target.speed
@@ -451,10 +487,21 @@ class TankBodyDriver (Driver):
 
             # Если танк врезался в стенку
             if bool_border2:
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x <= 60, 61, self.target.x)
-                self.target.x = self.manage_side(self.number_of_tank, self.target.x >= 963, 962, self.target.x)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y <= 60, 61, self.target.y)
-                self.target.y = self.manage_side(self.number_of_tank, self.target.y >= 835, 834, self.target.y)
+                self.target.x = self.manage_side(self.number_of_tank,
+                                                 self.target.x <= LEFT_DOWN_END_OF_MAP,
+                                                 LEFT_DOWN_END_OF_MAP + 1,
+                                                 self.target.x)
+                self.target.x = self.manage_side(self.number_of_tank,
+                                                 self.target.x >= RIGHT_END_OF_MAP,
+                                                 RIGHT_END_OF_MAP - 1,
+                                                 self.target.x)
+                self.target.y = self.manage_side(self.number_of_tank,
+                                                 self.target.y <= LEFT_DOWN_END_OF_MAP,
+                                                 LEFT_DOWN_END_OF_MAP + 1, self.target.y)
+                self.target.y = self.manage_side(self.number_of_tank,
+                                                 self.target.y >= UP_END_OF_MAP,
+                                                 UP_END_OF_MAP - 1,
+                                                 self.target.y)
 
             # Прикрепляем все танковые объекты к танку
             tank2_body_position_x = self.target.x
@@ -478,8 +525,8 @@ class TankBodyDriver (Driver):
             tank2_gun_layer.reload_image.x = self.target.x + TANK_WIDTH + RELOAD_IMAGE_SIZE
             tank2_gun_layer.reload_image.y = self.target.y + TANK_HEIGHT
 
-            nickname2_label.x = self.target.x - TANK_WIDTH
-            nickname2_label.y = self.target.y + TANK_HEIGHT + RELOAD_IMAGE_SIZE
+            tank2_gun_layer.nickname_label.x = self.target.x - TANK_WIDTH
+            tank2_gun_layer.nickname_label.y = self.target.y + TANK_HEIGHT + RELOAD_IMAGE_SIZE
 
             tank2_body_rotation = self.target.rotation
             tank2_speed = self.target.speed
@@ -500,16 +547,13 @@ class TankBodyDriver (Driver):
                     RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
 
-                self.target.x = random.randint(75, 900)
-                self.target.y = random.randint(75, 800)
-
             if number_of_tank == 2:
                 tank2_body_layer.tank_body_image.do(
                     RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
 
-                self.target.x = random.randint(75, 900)
-                self.target.y = random.randint(75, 800)
+            self.target.x = random.randint(LEFT_DOWN_END_OF_MAP, RIGHT_END_OF_MAP)
+            self.target.y = random.randint(LEFT_DOWN_END_OF_MAP, UP_END_OF_MAP)
 
             tank2_health -= WALL_DAMAGE * 5
             tank1_health -= WALL_DAMAGE * 5
@@ -547,7 +591,7 @@ class TankBodyDriver (Driver):
     # Скорость танка
     def change_speed(self, number_of_tank, invert_moving):
         if key_choose == number_of_tank:
-            self.target.speed = (keyboard[119] - keyboard[115]) * 100
+            self.target.acceleration = (keyboard[119] - keyboard[115]) * 100
         else:
             first_boolean = (self.key_clicked == 'w')
             second_boolean = (self.key_clicked == 's')
@@ -565,25 +609,21 @@ class TankBodyDriver (Driver):
 # Отрисовка пуль и пушки
 class TankGunAndBulletLayer(ScrollableLayer):
 
-    reload_image = Sprite("res/reload.png")  # Картинка перезарядки
-    whoom_control_image = Sprite("res/robot.png")  # Картинка управления
-    tank_gun_image = Sprite("res/tank_pushka.png")  # Картинка пушки
-    tank_gun_image_copy = Sprite("res/tank_pushka.png")  # Картинка, к которой крепится полоска здоровья
-    bullet_array = [Sprite("res/bullet.png"), Sprite("res/bullet.png"), Sprite("res/bullet.png")]  # Массив пуль
-    explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))  # Анимация взрыва
-
-    def __init__(self,picture):
+    def __init__(self, name, that_color, picture):
         super(TankGunAndBulletLayer, self).__init__()
 
-        # ОБЯЗАТЕЛЬНО ДУБЛИРОВАТЬ СПРАЙТЫ, ИНАЧЕ ДВА ОБЪЕКТЫ ПРЕВРАТЯТСЯ В ОДИН
-        self.tank_gun_image = Sprite(picture)
         self.whoom_control_image = Sprite("res/robot.png")
+        self.tank_gun_image = Sprite(picture)
         self.tank_gun_image_copy = Sprite(picture)
         self.reload_image = Sprite("res/reload.png")
         self.explosion_image = Sprite(pyglet.image.load_animation("res/explosion.gif"))
 
         self.j = 0
 
+        self.nickname_label = Label(name,
+                                font_name="BOLD",
+                                font_size=15,
+                                color=that_color)
 
         self.reload_image.do(FadeOut(0))
         self.tank_gun_image_copy.do(FadeOut(0))
@@ -600,6 +640,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
         self.add(self.tank_gun_image_copy)
         self.add(self.reload_image)
         self.add(self.explosion_image)
+        self.add(self.nickname_label)
 
     # Управление перезарядкой
     @staticmethod
@@ -621,7 +662,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
                     position_x,
                     position_y)
             else:
-                if time.clock() - last_tank1_shot_time > 1:
+                if time.clock() - last_tank1_shot_time > RECHARGING_SPEED:
                     TankGunAndBulletLayer.reload_animation_launch(tank1_gun_layer)
                     is_hitted1 = False
                     j = TankGunAndBulletLayer.push_bullet(
@@ -647,7 +688,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
                     position_x,
                     position_y)
             else:
-                if time.clock() - last_tank2_shot_time > 1:
+                if time.clock() - last_tank2_shot_time > RECHARGING_SPEED:
                     TankGunAndBulletLayer.reload_animation_launch(tank2_gun_layer)
                     is_hitted2 = False
                     j = TankGunAndBulletLayer.push_bullet(
@@ -667,7 +708,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
     def reload_animation_launch(tank_gun_layer):
         tank_gun_layer.reload_image.do(FadeIn(0))
         tank_gun_layer.reload_image.do(Rotate(360, 1))
-        tank_gun_layer.reload_image.do(FadeOut(1))
+        tank_gun_layer.reload_image.do(FadeOut(RECHARGING_SPEED))
 
     # Полёт ракеты
     @staticmethod
@@ -725,10 +766,10 @@ class KeyListener(ScrollableLayer):
     # Нажатие на клавишу
     @staticmethod
     def on_key_press(key_click, modifiers):
-        global tank1_body_position_x, tank1_body_position_y, key_choose, focus_on
+        global tank1_body_position_x, tank1_body_position_y, key_choose, focus_on, disconnect, disconnect1, disconnect2
 
         # Клавиша пробел
-        if key_click == 32 :
+        if key_click == 32:
             if key_choose == 1:
                 tank1_gun_layer.j = tank1_gun_layer.shoot_bullet(
                     tank1_gun_layer.j,
@@ -752,9 +793,13 @@ class KeyListener(ScrollableLayer):
             key_choose = 1
             focus_on = 1
 
-            TankLibraryInitialize.stop_all()
-            TankLibraryInitialize.connect1()
-            TankLibraryInitialize.connect2(1)
+            disconnect = 1
+            disconnect1 = 1
+            disconnect2 = 0
+
+            ConnectionClass.stop_all()
+            ConnectionClass.connect_to_tank1(1)
+            ConnectionClass.connect_to_tank2()
 
             KeyListener.delete_and_load_image("res/man.png", "res/robot.png")
 
@@ -770,14 +815,35 @@ class KeyListener(ScrollableLayer):
             key_choose = 2
             focus_on = 2
 
+            disconnect = 1
+            disconnect1 = 0
+            disconnect2 = 1
+
             KeyListener.delete_and_load_image("res/robot.png", "res/man.png")
 
-            TankLibraryInitialize.stop_all()
-            TankLibraryInitialize.connect2()
-            TankLibraryInitialize.connect1(1)
+            ConnectionClass.stop_all()
+            ConnectionClass.connect_to_tank2(1)
+            ConnectionClass.connect_to_tank1()
 
             tank1_body_layer.focus_frame.do(FadeOut(0))
             tank2_body_layer.focus_frame.do(FadeIn(0))
+
+        # Клавиша 'V'
+        if key_click == 118 and key_choose != 3:
+
+            move_tank_body_2_code = ''
+            rotate_gun_2_code = ''
+            key_choose = 3
+
+            disconnect = 1
+            disconnect1 = 1
+            disconnect2 = 1
+
+            KeyListener.delete_and_load_image("res/man.png", "res/man.png")
+
+            ConnectionClass.stop_all()
+            ConnectionClass.connect_to_tank2()
+            ConnectionClass.connect_to_tank1()
 
         # Клавиша 'C'
         if key_click == 99 and key_choose != 0:
@@ -786,9 +852,13 @@ class KeyListener(ScrollableLayer):
             move_tank_body_2_code = ''
             rotate_gun_2_code = ''
 
+            disconnect = 0
+            disconnect1 = 1
+            disconnect2 = 1
+
             key_choose = 0
-            TankLibraryInitialize.connect1(1)
-            TankLibraryInitialize.connect2(1)
+            ConnectionClass.stop_all()
+            ConnectionClass.connect_both_tanks()
 
             KeyListener.delete_and_load_image("res/robot.png", "res/robot.png")
 
@@ -818,12 +888,7 @@ class KeyListener(ScrollableLayer):
 
 # Отрисовка танка
 class TankBodyLayer(ScrollableLayer):
-
-    tank_body_image = Sprite("res/bullet.png")
-    focus_frame = Sprite("res/focus_frame.png")
-
     def __init__(self, picture, pos, max_speed, min_speed):
-
         super(TankBodyLayer, self).__init__()
 
         self.tank_body_image = Sprite(picture)
@@ -881,7 +946,7 @@ class TankLibraryInitialize(TankMechanics):
         number_of_tank = TankLibraryInitialize.determine_the_number()
 
         if number_of_tank == 1:
-            global tank1_gun_layer, tank1_body_position_x, tank1_body_position_y
+            global tank1_body_position_x, tank1_body_position_y
             tank1_gun_layer.j = tank1_gun_layer.shoot_bullet(
                 tank1_gun_layer.j,
                 tank1_gun_layer.bullet_array,
@@ -889,7 +954,7 @@ class TankLibraryInitialize(TankMechanics):
                 tank1_body_position_x,
                 tank1_body_position_y)
         else:
-            global tank2_gun_layer, tank2_body_position_x, tank2_body_position_y
+            global tank2_body_position_x, tank2_body_position_y
             tank2_gun_layer.j = tank2_gun_layer.shoot_bullet(
                 tank2_gun_layer.j,
                 tank2_gun_layer.bullet_array,
@@ -990,35 +1055,6 @@ class TankLibraryInitialize(TankMechanics):
             invert_gun_rotate2 *= -1
 
     @staticmethod
-    def set_nickname(nickname='Tank'):
-        global set_nickname_1_code, set_nickname_2_code
-
-        number_of_tank = TankLibraryInitialize.determine_the_number()
-
-        if (number_of_tank == 1) and (set_nickname_1_code != nickname):
-            global nickname1_label
-
-            set_nickname_1_code = nickname
-
-            tank1_gun_layer.remove(nickname1_label)
-            nickname1_label = Label(nickname,
-                                    font_name="BOLD",
-                                    font_size=15,
-                                    color=(255, 0, 0, 180))
-            tank1_gun_layer.add(nickname1_label)
-        elif (number_of_tank == 2) and (set_nickname_2_code != nickname):
-            global nickname2_label
-
-            set_nickname_2_code = nickname
-
-            tank2_gun_layer.remove(nickname2_label)
-            nickname2_label = Label(nickname,
-                                    font_name="BOLD",
-                                    font_size=15,
-                                    color=(0, 0, 255, 180))
-            tank2_gun_layer.add(nickname2_label)
-
-    @staticmethod
     def get_body_angle(self=0):
         number_of_tank = TankLibraryInitialize.determine_the_number()
 
@@ -1096,6 +1132,13 @@ class TankLibraryInitialize(TankMechanics):
             return last_tank1_shot_time
 
     @staticmethod
+    def get_distance_between_tanks():
+        global tank1_body_position_x, tank1_body_position_y, tank2_body_position_x, tank2_body_position_y
+        distance = math.sqrt(((tank2_body_position_x - tank1_body_position_x)**2) +
+                             ((tank2_body_position_y - tank1_body_position_y)**2))
+        return distance
+
+    @staticmethod
     def get_x(self=0):
 
         number_of_tank = TankLibraryInitialize.determine_the_number()
@@ -1118,29 +1161,6 @@ class TankLibraryInitialize(TankMechanics):
         else:
             global tank2_body_position_y
             return tank2_body_position_y
-
-    @staticmethod
-    def pointing():
-        global tank1_body_position_x, tank1_body_position_y
-        global tank2_body_position_x, tank2_body_position_y
-        adder = CDLL('./make_angle.dll')
-
-        number_of_tank = TankLibraryInitialize.determine_the_number()
-
-        if number_of_tank == 1:
-            x1 = c_float(tank1_body_position_x)
-            x2 = c_float(tank2_body_position_x)
-            y1 = c_float(tank1_body_position_y)
-            y2 = c_float(tank2_body_position_y)
-        else:
-            x2 = c_float(tank1_body_position_x)
-            x1 = c_float(tank2_body_position_x)
-            y2 = c_float(tank1_body_position_y)
-            y1 = c_float(tank2_body_position_y)
-
-        make_angle = adder.make_angle
-        make_angle.restype = c_float
-        return make_angle(x1, y1, x2, y2)
 
     @staticmethod
     def move_tank_body(that_key='w', speed=0, rotation=0):
@@ -1227,36 +1247,75 @@ class TankLibraryInitialize(TankMechanics):
             tank2_gun_layer.tank_gun_image.do(gun_driver)
 
     @staticmethod
+    def determine_angle():
+        global tank1_body_position_x, tank1_body_position_y, tank2_body_position_x, tank2_body_position_y
+        number_of_tank = TankLibraryInitialize.determine_the_number()
+        if number_of_tank == 1:
+            angle = TankLibraryInitialize.help_to_determine_angle(
+                tank1_body_position_x,
+                tank1_body_position_y,
+                tank2_body_position_x,
+                tank2_body_position_y)
+        else:
+            angle = TankLibraryInitialize.help_to_determine_angle(
+                tank2_body_position_x,
+                tank2_body_position_y,
+                tank1_body_position_x,
+                tank1_body_position_y)
+        return angle
+
+    @staticmethod
+    def help_to_determine_angle(x1, y1, x2, y2):
+        angle = math.degrees(math.atan((y2 - y1) / (x2 - x1)))
+        if (x2 - x1 > 0) and (y2 - y1 > 0):
+            angle = 90 - angle
+        elif (x2 - x1 < 0) and (y2 - y1 > 0):
+            angle = - 90 - angle
+        elif (x2 - x1 < 0) and (y2 - y1 < 0):
+            angle = - 90 - angle
+        elif (x2 - x1 > 0) and (y2 - y1 < 0):
+            angle = 90 - angle
+        elif (x2 - x1 == 0) and (y2 - y1 < 0):
+            angle = 180
+        elif (x2 - x1 > 0) and (y2 - y1 == 0):
+            angle = 90
+        elif (x2 - x1 == 0) and (y2 - y1 > 0):
+            angle = 0
+        elif (x2 - x1 < 0) and (y2 - y1 == 0):
+            angle = -90
+        return angle
+
+    @staticmethod
     def make_gun_angle(angle=1):
         global TANK_MAX_ANGLE_OF_GUN_ROTATION, make_gun_angle_time1, make_gun_angle_time2
 
-        if time.clock() > make_gun_angle_time1:
-            make_gun_angle_time1 = time.clock() + 0.1
-
-            number_of_tank = TankLibraryInitialize.determine_the_number()
-
-            # side = 'right'
-            # if angle < 0:
-            #    angle *= -1
-            #    side = 'left'
+        #if time.clock() > make_gun_angle_time1:
+        #    make_gun_angle_time1 = time.clock() + 0.1
 #
-            if number_of_tank == 1:
-                tank1_gun_layer.tank_gun_image.rotation = angle
+        number_of_tank = TankLibraryInitialize.determine_the_number()
 #
-                # print(angle,tank1_gun_layer.tank_gun_image.rotation)
+        #    side = 'right'
+        #    if angle < 0:
+        #        angle *= -1
+        #        side = 'left'
 #
-            #    if tank1_gun_rotation != angle:
-            #        if angle < TANK_MAX_ANGLE_OF_GUN_ROTATION:
-            #            tank_library_initialize.rotate_gun1(angle, side, 1)
-            #        else:
-            #            tank_library_initialize.rotate_gun1(TANK_MAX_ANGLE_OF_GUN_ROTATION, side, 1)
-            else:
-                tank2_gun_layer.tank_gun_image.rotation = angle
-            #    if tank2_gun_rotation != angle:
-            #        if angle < TANK_MAX_ANGLE_OF_GUN_ROTATION:
-            #            tank_library_initialize.rotate_gun2(angle, side, 1)
-            #        else:
-            #            tank_library_initialize.rotate_gun2(TANK_MAX_ANGLE_OF_GUN_ROTATION, side, 1)
+        if number_of_tank == 1:
+            tank1_gun_layer.tank_gun_image.rotation = angle
+#
+        #        print(angle,tank1_gun_layer.tank_gun_image.rotation)
+#
+        #        if tank1_gun_rotation != angle:
+        #            if angle < TANK_MAX_ANGLE_OF_GUN_ROTATION:
+        #                TankLibraryInitialize.rotate_gun1(angle, side, 1)
+        #            else:
+        #                TankLibraryInitialize.rotate_gun1(TANK_MAX_ANGLE_OF_GUN_ROTATION, side, 1)
+        else:
+            tank2_gun_layer.tank_gun_image.rotation = angle
+        #        if tank2_gun_rotation != angle:
+        #            if angle < TANK_MAX_ANGLE_OF_GUN_ROTATION:
+        #                TankLibraryInitialize.rotate_gun2(angle, side, 1)
+        #            else:
+        #                TankLibraryInitialize.rotate_gun2(TANK_MAX_ANGLE_OF_GUN_ROTATION, side, 1)
 
     @staticmethod
     def rotate_gun1(angle=1, side='right', continued=0):
@@ -1270,8 +1329,6 @@ class TankLibraryInitialize(TankMechanics):
     def rotate_gun(angle=1, side='right', continued=0):
         assert (angle > 0)
 
-        # print('sooo',angle, side)
-
         global rotate_gun_1_code, rotate_gun_2_code
 
         number_of_tank = TankLibraryInitialize.determine_the_number()
@@ -1281,7 +1338,7 @@ class TankLibraryInitialize(TankMechanics):
 
         code = str(angle) + side + function_name
 
-        if (number_of_tank) == 1 and ((rotate_gun_1_code != code) or (continued == 1)):
+        if (number_of_tank == 1) and (rotate_gun_1_code != code or continued == 1):
             global stop_tank1_gun_side_angle
 
             global tank1_body_position_x
@@ -1346,50 +1403,8 @@ class TankLibraryInitialize(TankMechanics):
         return number_of_tank
 
     @staticmethod
-    def stop_all(real_all=0):
-        tank1_body_layer.stop()
-        tank2_body_layer.stop()
-
-        # tank_body_layer.tank_body_image.stop() не отключать, он регулируется в move_tank_body
-
-        tank1_gun_layer.stop()
-        tank2_gun_layer.stop()
-        tank1_gun_layer.tank_gun_image.stop()
-        tank2_gun_layer.tank_gun_image.stop()
-        tank1_gun_layer.tank_gun_image_copy.stop()
-        tank2_gun_layer.tank_gun_image_copy.stop()
-
-        if real_all == 1:
-            tank1_body_layer.stop()
-            tank2_body_layer.stop()
-
-    @staticmethod
-    def connect1(connect_user=0):
-        if connect_user == 0:
-            TankLibraryInitialize.move_tank_body()
-            TankLibraryInitialize.rotate_gun()
-        else:
-            tank1_body_layer.do(FirstTankClass.driverByFirstUser())
-
-        strip_health1_driver = StripDriver()
-        strip_health1_driver.strip_driver_settings(1)
-        tank1_gun_layer.tank_gun_image_copy.do(strip_health1_driver)
-
-    @staticmethod
-    def connect2(connect_user=0):
-        if connect_user == 0:
-            TankLibraryInitialize.move_tank_body()
-            TankLibraryInitialize.rotate_gun()
-        else:
-            tank2_body_layer.do(SecondTankClass.driverBySecondUser())
-
-        strip_health2_driver = StripDriver()
-        strip_health2_driver.strip_driver_settings(2)
-        tank2_gun_layer.tank_gun_image_copy.do(strip_health2_driver)
-
-    @staticmethod
     def die(number_of_tank):
-        global bool_end
+        global bool_end, disconnect, disconnect1, disconnect2
         bool_end = 0
 
         if number_of_tank == 1:
@@ -1401,10 +1416,10 @@ class TankLibraryInitialize(TankMechanics):
             # Исчезновение погибшего танка
             tank1_body_layer.tank_body_image.do(FadeOut(1))
             tank1_gun_layer.tank_gun_image.do(FadeOut(1))
-            nickname1_label.do(FadeOut(1))
+            tank1_gun_layer.nickname_label.do(FadeOut(1))
             health_strip1.do(FadeOut(1))
 
-            name = 'танк названием "' + nickname2_label.element.text + '"'
+            name = tank2_gun_layer.nickname_label.element.text
             bool_border1 = 0
         else:
             global bool_border2
@@ -1415,21 +1430,104 @@ class TankLibraryInitialize(TankMechanics):
             # Исчезновение погибшего танка
             tank2_body_layer.tank_body_image.do(FadeOut(1))
             tank2_gun_layer.tank_gun_image.do(FadeOut(1))
-            nickname2_label.do(FadeOut(1))
+            tank2_gun_layer.nickname_label.do(FadeOut(1))
             health_strip2.do(FadeOut(1))
 
-            name = 'танк под названием "' + nickname1_label.element.text + '"' + " победил"
-
+            name = tank1_gun_layer.nickname_label.element.text
             bool_border2 = 0
 
         # Запуск финальной сцены
-        name = 1
         final_scene = Scene()
         final_scene.add(FinalBack())
-        final_scene.add(FinalScene(name))
+        final_scene.add(FinalScene('Победитель: ' + name))
         final_scene.add(FinalMenu())
+        disconnect = 1
+        disconnect1 = 1
+        disconnect2 = 1
         director.replace(FadeTRTransition(final_scene, duration=2))
 
+
+# Управление подключениями автоматического и ручного управления
+class ConnectionClass():
+
+    @staticmethod
+    def stop_all(real_all=0):
+        tank1_body_layer.stop()
+        tank2_body_layer.stop()
+        tank1_gun_layer.stop()
+        tank2_gun_layer.stop()
+        tank1_gun_layer.tank_gun_image.stop()
+        tank2_gun_layer.tank_gun_image.stop()
+        tank1_gun_layer.tank_gun_image_copy.stop()
+        tank2_gun_layer.tank_gun_image_copy.stop()
+
+        if real_all == 1:
+            global disconnect, disconnect1, disconnect2
+            disconnect = 1
+            disconnect1 = 1
+            disconnect2 = 1
+
+    @staticmethod
+    def connect_users():
+        global disconnect
+        while not disconnect:
+            FirstTankClass.strategy(TankLibraryInitialize)
+            time.sleep(0.1)
+            SecondTankClass.strategy(TankLibraryInitialize)
+            time.sleep(0.1)
+
+    @staticmethod
+    def connect_first_user():
+        global disconnect1
+        while not disconnect1:
+            FirstTankClass.strategy(TankLibraryInitialize)
+            time.sleep(0.1)
+
+    @staticmethod
+    def connect_second_user():
+        global disconnect2
+        while not disconnect2:
+            SecondTankClass.strategy(TankLibraryInitialize)
+            time.sleep(0.1)
+
+    @staticmethod
+    def connect_to_tank1(connect_user=0):
+        if connect_user == 0:
+            TankLibraryInitialize.move_tank_body()
+            TankLibraryInitialize.rotate_gun2()
+        else:
+            thread_for_second_user = threading.Thread(target=ConnectionClass.connect_second_user)
+            thread_for_second_user.start()
+
+        strip_health1_driver = StripDriver()
+        strip_health1_driver.strip_driver_settings(1)
+        tank1_gun_layer.tank_gun_image_copy.do(strip_health1_driver)
+
+    @staticmethod
+    def connect_to_tank2(connect_user=0):
+        if connect_user == 0:
+            TankLibraryInitialize.move_tank_body()
+            TankLibraryInitialize.rotate_gun1()
+        else:
+            thread_for_first_user = threading.Thread(target=ConnectionClass.connect_first_user)
+            thread_for_first_user.start()
+
+        strip_health2_driver = StripDriver()
+        strip_health2_driver.strip_driver_settings(2)
+        tank2_gun_layer.tank_gun_image_copy.do(strip_health2_driver)
+
+    @staticmethod
+    def connect_both_tanks():
+        strip_health1_driver = StripDriver()
+        strip_health1_driver.strip_driver_settings(1)
+        tank1_gun_layer.tank_gun_image_copy.do(strip_health1_driver)
+
+        strip_health2_driver = StripDriver()
+        strip_health2_driver.strip_driver_settings(2)
+        tank2_gun_layer.tank_gun_image_copy.do(strip_health2_driver)
+
+        thread_for_both_users = threading.Thread(target=ConnectionClass.connect_users)
+        thread_for_both_users.start()
 
 # Создание класса корпуса первого танка
 tank1_body_layer = TankBodyLayer(
@@ -1445,23 +1543,23 @@ tank2_body_layer = TankBodyLayer(
     TANK2_MAX_FORWARD_SPEED,
     TANK2_MAX_REVERSE_SPEED)
 
+try:
+    nick1 = FirstTankClass.name
+except AttributeError:
+    nick1 = 'Танк1'
+
+try:
+    nick2 = SecondTankClass.name
+except AttributeError:
+    nick2 = 'Танк2'
+
 # Создание классов пушек
-tank1_gun_layer = TankGunAndBulletLayer("res/tank_pushka.png")
-tank2_gun_layer = TankGunAndBulletLayer("res/tank_pushka2.png")
-
-# Установка названия первого танка
-nickname1_label = Label("Tank1",
-                        font_name="BOLD",
-                        font_size=15,
-                        color=(255, 0, 0, 180))
-tank1_gun_layer.add(nickname1_label)
-
-# Установка названия второго танка
-nickname2_label = Label("Tank2",
-                        font_name="BOLD",
-                        font_size=15,
-                        color=(0, 0, 255, 180))
-tank2_gun_layer.add(nickname2_label)
+tank1_gun_layer = TankGunAndBulletLayer(nick1,
+                                        (255, 0, 0, 255),
+                                        "res/tank_pushka.png")
+tank2_gun_layer = TankGunAndBulletLayer(nick2,
+                                        (0, 0, 255, 255),
+                                        "res/tank_pushka2.png")
 
 # Полоска жизней первого танка и её настройка
 health_strip1 = StripCanvas(
@@ -1481,37 +1579,20 @@ health_strip2 = StripCanvas(
     tank2_health)
 tank2_gun_layer.add(health_strip2)
 
-# Обновление библиотечных функций
-TankMechanics.move_tank_body = TankLibraryInitialize.move_tank_body
-TankMechanics.rotate_gun = TankLibraryInitialize.rotate_gun
-TankMechanics.get_x = TankLibraryInitialize.get_x
-TankMechanics.get_y = TankLibraryInitialize.get_y
-TankMechanics.get_gun_angle = TankLibraryInitialize.get_gun_angle
-TankMechanics.get_body_angle = TankLibraryInitialize.get_body_angle
-TankMechanics.set_nickname = TankLibraryInitialize.set_nickname
-TankMechanics.fire = TankLibraryInitialize.fire
-TankMechanics.get_boolean_hit_the_tank = TankLibraryInitialize.get_boolean_hit_the_tank
-TankMechanics.get_boolean_recharging = TankLibraryInitialize.get_boolean_recharging
-TankMechanics.get_boolean_focus_on = TankLibraryInitialize.get_boolean_focus_on
-TankMechanics.stop_moving = TankLibraryInitialize.stop_moving
-TankMechanics.invert_moving = TankLibraryInitialize.invert_moving
-TankMechanics.invert_body_rotating = TankLibraryInitialize.invert_body_rotating
-TankMechanics.invert_gun_rotating = TankLibraryInitialize.invert_gun_rotating
-TankMechanics.get_health = TankLibraryInitialize.get_health
-TankMechanics.get_speed = TankLibraryInitialize.get_speed
-TankMechanics.get_enemy_x = TankLibraryInitialize.get_enemy_x
-TankMechanics.get_enemy_y = TankLibraryInitialize.get_enemy_y
-TankMechanics.get_last_enemy_shot_time = TankLibraryInitialize.get_last_enemy_shot_time
-TankMechanics.make_gun_angle = TankLibraryInitialize.make_gun_angle
-TankMechanics.pointing = TankLibraryInitialize.pointing
+ConnectionClass.connect_to_tank1(0)
+ConnectionClass.connect_to_tank2(0)
 
-# Подключение драйверов разработчиков
-TankLibraryInitialize.connect1(1)
-TankLibraryInitialize.connect2(1)
+#thread_for_both_users = threading.Thread(target=ConnectionClass.connect_users)
+#thread_for_both_users.start()
+#thread_for_both_users.join()
+
+#thread_for_first_user = threading.Thread(target=ConnectionClass.connect_to_tank1())
+#thread_for_second_user = threading.Thread(target=ConnectionClass.connect_to_tank2())
+
+ConnectionClass.connect_both_tanks()
 
 # Настройка карты
 map_layer = load("res/road.tmx")["map0"]
-
 scroller.add(map_layer)
 
 keyListener = KeyListener()

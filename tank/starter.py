@@ -6,7 +6,6 @@ from cocos.layer import *
 
 def main():
     menu_scene = Scene()
-
     menu_scene.add(BackgroundLayer())
     menu_scene.add(MultiplexLayer(MainMenu(), Authors(), FinalMenu()))
     director.run(menu_scene)

@@ -18,7 +18,7 @@ def strategy3(self):
 #name = 'Екатерина' 2.0
 
 name = 'Елизавета' #3.0
-model = 'light' #3.0
+#model = 'light' #3.0
 
 def strategy(functions):
     #print(functions.get_x(), functions.get_y())

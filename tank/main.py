@@ -1546,7 +1546,18 @@ except AttributeError:
     nick2 = 'Танк2'
 
 
-if FirstTankClass.model == 'heavy':
+try:
+    model1 = FirstTankClass.model
+except AttributeError:
+    model1 = 'light'
+
+try:
+    model2 = SecondTankClass.model
+except AttributeError:
+    model2 = 'light'
+
+
+if model1 == 'heavy':
     # Создание класса корпуса первого танка
     TANK1_DAMAGE = 8
     TANK1_MAX_FORWARD_SPEED = 80
@@ -1562,7 +1573,7 @@ if FirstTankClass.model == 'heavy':
     tank1_gun_layer = TankGunAndBulletLayer(nick1,
                                             (255, 0, 0, 255),
                                             "res/tank_heavy_pushka.png")
-elif FirstTankClass.model == 'light':
+elif model1 == 'light':
     # Создание класса корпуса первого танка
     TANK1_DAMAGE = 2
     TANK1_MAX_FORWARD_SPEED = 100
@@ -1580,7 +1591,7 @@ elif FirstTankClass.model == 'light':
                                         "res/tank_light_pushka.png")
 
 
-if SecondTankClass.model == 'heavy':
+if model2 == 'heavy':
     # Создание класса корпуса первого танка
     TANK2_DAMAGE = 8
     TANK2_MAX_FORWARD_SPEED = 80
@@ -1595,7 +1606,7 @@ if SecondTankClass.model == 'heavy':
     tank2_gun_layer = TankGunAndBulletLayer(nick2,
                                         (0, 0, 255, 255),
                                         "res/tank_heavy_pushka2.png")
-elif SecondTankClass.model == 'light':
+elif model2 == 'light':
     # Создание класса корпуса первого танка
     TANK2_DAMAGE = 2
     TANK2_MAX_FORWARD_SPEED = 100

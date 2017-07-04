@@ -3,7 +3,7 @@ def strategy3(self):
     self.rotate_gun(1, 'right')
 
 name = 'Боб'
-model = 'heavy' #3.0
+#model = 'heavy' #3.0
 
 def strategy(self):
     smart_angle = 0

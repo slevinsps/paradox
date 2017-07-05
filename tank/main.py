@@ -617,10 +617,8 @@ class TankGunAndBulletLayer(ScrollableLayer):
     def __init__(self, name, that_color, picture):
         super(TankGunAndBulletLayer, self).__init__()
 
-        script_dir = os.path.dirname(__file__)
-        path = os.path.join(script_dir, 'res/robot.png')
-        image = pyglet.image.load(path)
-        self.whoom_control_image = Sprite(image)
+
+        self.whoom_control_image = Sprite(picture)
         self.tank_gun_image = Sprite(picture)
         self.tank_gun_image_copy = Sprite(picture)
 
@@ -676,6 +674,7 @@ class TankGunAndBulletLayer(ScrollableLayer):
                     number_of_tank,
                     position_x,
                     position_y)
+
             else:
                 if time.clock() - last_tank1_shot_time > RECHARGING_SPEED1:
                     TankGunAndBulletLayer.reload_animation_launch(tank1_gun_layer)
@@ -1284,15 +1283,17 @@ class TankLibraryInitialize(TankMechanics):
 
     @staticmethod
     def help_to_determine_angle(x1, y1, x2, y2):
-        angle = math.degrees(math.atan((y2 - y1) / (x2 - x1)))
+        def calculate(x1, y1, x2, y2):
+            return math.degrees(math.atan((y2 - y1) / (x2 - x1)))
+        
         if (x2 - x1 > 0) and (y2 - y1 > 0):
-            angle = 90 - angle
+            angle = 90 - calculate(x1, y1, x2, y2)
         elif (x2 - x1 < 0) and (y2 - y1 > 0):
-            angle = - 90 - angle
+            angle = - 90 - calculate(x1, y1, x2, y2)
         elif (x2 - x1 < 0) and (y2 - y1 < 0):
-            angle = - 90 - angle
+            angle = - 90 - calculate(x1, y1, x2, y2)
         elif (x2 - x1 > 0) and (y2 - y1 < 0):
-            angle = 90 - angle
+            angle = 90 - calculate(x1, y1, x2, y2)
         elif (x2 - x1 == 0) and (y2 - y1 < 0):
             angle = 180
         elif (x2 - x1 > 0) and (y2 - y1 == 0):
@@ -1413,7 +1414,7 @@ class TankLibraryInitialize(TankMechanics):
             number_of_tank = 1
         elif 'SecondTankClass' in filename:
             number_of_tank = 2
-        elif 'main':
+        else:
             if '1' in function_name:
                 number_of_tank = 1
             elif '2' in function_name:
@@ -1606,9 +1607,7 @@ elif model1 == 'light':
     script_dir = os.path.dirname(__file__)
     path = os.path.join(script_dir, 'res/tank_light_pushka.png')
     image = pyglet.image.load(path)
-    tank1_gun_layer = TankGunAndBulletLayer(nick1,
-                                        (255, 0, 0, 255),
-                                        image)
+    tank1_gun_layer = TankGunAndBulletLayer(nick1,(255, 0, 0, 255),image)
 
 
 if model2 == 'heavy':
@@ -1668,8 +1667,8 @@ health_strip2 = StripCanvas(
     tank2_health)
 tank2_gun_layer.add(health_strip2)
 
-ConnectionClass.connect_to_tank1(0)
-ConnectionClass.connect_to_tank2(0)
+#ConnectionClass.connect_to_tank1(0)
+#ConnectionClass.connect_to_tank2(0)
 
 #thread_for_both_users = threading.Thread(target=ConnectionClass.connect_users)
 #thread_for_both_users.start()
@@ -1678,11 +1677,11 @@ ConnectionClass.connect_to_tank2(0)
 #thread_for_first_user = threading.Thread(target=ConnectionClass.connect_to_tank1())
 #thread_for_second_user = threading.Thread(target=ConnectionClass.connect_to_tank2())
 
-ConnectionClass.connect_both_tanks()
+#ConnectionClass.connect_both_tanks()
 
 # Настройка карты
-map_layer = load("res/road.tmx")["map0"]
-scroller.add(map_layer)
+#map_layer = load("res/road.tmx")["map0"]
+#scroller.add(map_layer)
 
 keyListener = KeyListener()
 

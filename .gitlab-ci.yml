@@ -5,7 +5,10 @@ stages:
 build:
   stage: build
   script: 
-  - apt-get install python3-setuptools
+  - apt-get install software-properties-common
+  - apt-add-repository universe
+  - apt-get update
+  - apt-get install python-pip
   - python setup.py sdist
   only:
     - branches

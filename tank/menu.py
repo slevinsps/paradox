@@ -1,7 +1,7 @@
-import shutil
-import os
 from pyglet.gl import *
 from cocos.menu import *
+import shutil
+import os
 from cocos.scene import *
 from cocos.layer import *
 from cocos.sprite import Sprite
@@ -10,17 +10,19 @@ from cocos.scenes.transitions import FadeTRTransition
 from main import scene as new_game
 from choose_one import layer as choose_layer
 
+
 class BackgroundLayer(Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('res/background.png')
 
-    def draw( self ):
+    def draw(self):
         glColor4ub(255, 255, 255, 255)
         glPushMatrix()
         self.transform()
-        self.img.blit(0,0)
+        self.img.blit(0, 0)
         glPopMatrix()
+
 
 class MainMenu(Menu):
     def __init__(self):
@@ -35,17 +37,21 @@ class MainMenu(Menu):
         item3 = MenuItem('Авторы', self.on_authors)
         item4 = MenuItem('Выход', self.on_quit)
 
-        #self.font_item['font_name'] = 'Times New Roman'
-        #self.sprite = Sprite('res/back.jpg')
-        #self.sprite.position = 0, 0
+        self.font_item['font_name'] = 'Times New Roman'
+        self.sprite = Sprite('res/back.jpg')
+        self.sprite.position = 0, 0
 
         self.create_menu([item1, item2, item3, item4], ac.ScaleTo(1.25, duration=0.25), ac.ScaleTo(1.0, duration=0.25))
-
-    def on_quit(self):
+    @staticmethod
+    def on_quit():
         pyglet.app.exit()
 
     def on_authors(self):
         self.parent.switch_to(1)
+
+    @staticmethod
+    def on_play():
+        director.replace(FadeTRTransition(new_game, duration=2))
 
     def on_instructions(self):
         pass
@@ -61,6 +67,7 @@ class MainMenu(Menu):
             pass
         director.replace(FadeTRTransition(choose_layer, duration=2))
 
+
 class Authors(Menu):
     def __init__(self):
         super(Authors, self).__init__()
@@ -75,7 +82,7 @@ class Authors(Menu):
                          ac.ScaleTo(1.0, duration=0.25))
 
     def on_callback(self):
-        print('item callbackKOt')
+        pass
 
     def on_back(self):
         self.parent.switch_to(0)

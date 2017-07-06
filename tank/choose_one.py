@@ -23,7 +23,6 @@ class ChooseOneLayer(Layer):
 
 
 class ChooseOneMenu(Menu):
-
     def __init__(self):
         super(ChooseOneMenu, self).__init__("Загрузка ботов")
 
@@ -43,12 +42,11 @@ class ChooseOneMenu(Menu):
                          layout_strategy=fixedPositionMenuLayout([(150, 400), (650, 400),
                                                                   (450, 260), (750, 360)]))
 
-    def on_image_callback_red(self):
+    @staticmethod
+    def on_image_callback_red():
         print('image')
         try:
             open('dest/red_bot.py')
-
-
         except FileNotFoundError:
             pass
         except PermissionError:
@@ -56,10 +54,8 @@ class ChooseOneMenu(Menu):
         except RuntimeError:
             pass
 
-        print('red_choose')
-
-
-    def on_image_callback_blue(self):
+    @staticmethod
+    def on_image_callback_blue():
         print('image2')
         try:
             open('dest/blue_bot.py')
@@ -71,12 +67,10 @@ class ChooseOneMenu(Menu):
         except RuntimeError:
             pass
 
-        print('blue_choose')
 
-
-class Start_game_menu(Menu):
+class StartGameMenu(Menu):
     def __init__(self):
-        super(Start_game_menu, self).__init__()
+        super(StartGameMenu, self).__init__()
 
         item1 = MenuItem('Старт', self.on_start)
         item2 = MenuItem('Выход', self.on_quit)
@@ -87,7 +81,8 @@ class Start_game_menu(Menu):
         self.create_menu([item1, item2],
                          layout_strategy=fixedPositionMenuLayout([(400, 120), (400, 70), (500, 100), (500, 50)]))
 
-    def on_start(self):
+    @staticmethod
+    def on_start():
         if os.path.isfile('dest/blue_bot.py'):
             if os.path.isfile('dest/red_bot.py'):
                 from main import scene
@@ -98,7 +93,8 @@ class Start_game_menu(Menu):
         else:
             print('Noo')
 
-    def on_quit(self):
+    @staticmethod
+    def on_quit():
         sys.exit()
 
 
@@ -106,20 +102,19 @@ class OpenFile(QMainWindow):
     def __init__(self, name):
         super().__init__()
 
-        file = QFileDialog.getOpenFileName(self, caption='Загрузка бота', filter='Py (*.py*.dll)',
+        file = QFileDialog.getOpenFileName(self, caption='Загрузка бота', filter='Py (*.py*)',
                                            initialFilter='Exes (*.exe*.dll)')
-        fileName = file[0]
-        shutil.copy(fileName, name)
+        file_name = file[0]
+        shutil.copy(file_name, name)
+
 
 def open(name):
-    print('open')
     OpenFile(name)
     director.run(layer)
 
 layer = Scene()
 layer.add(ChooseOneLayer())
-layer.add(Start_game_menu())
+layer.add(StartGameMenu())
 layer.add(ChooseOneMenu())
 
 app = QApplication(sys.argv)
-

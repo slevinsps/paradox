@@ -1,4 +1,16 @@
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - command build
+  only:
+    - branches
+
 test:python35:
+    stage: test
     image: python:3.5
     script: 
     - pip install -r requirements.txt  

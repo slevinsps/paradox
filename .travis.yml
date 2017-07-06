@@ -1,7 +1,9 @@
 language: python
 python:
       - "3.5"
-install: "pip install -r requirements.txt"
+install:
+      - "pip install -r requirements.txt"
+      - "sudo apt-get install python3-setuptools"
 script: 
       - export PYTHONPATH=../
       - pytest -v --cov

@@ -5,12 +5,12 @@ stages:
 
 build_job:
   stage: build
-  script: python main.py bdist --format = zip
+  script: 
 
 
 test_job:
   stage: test
-  script: pytest -v
+  script: pytest
 
 deploy_job:
   stage: deploy

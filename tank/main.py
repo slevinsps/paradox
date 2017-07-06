@@ -494,25 +494,37 @@ class TankBodyDriver (Driver):
 
     # Столкновение танков друг с другом
     def determine_tanks_hit(self, number_of_tank):
+
         global tank1_health, tank2_health
         global tank1_body_position_x, tank1_body_position_y
         global tank2_body_position_x, tank2_body_position_y
         if math.sqrt(abs(tank1_body_position_x - tank2_body_position_x) ** 2 + abs(
                         tank1_body_position_y - tank2_body_position_y) ** 2) <= TANK_WIDTH:
-
+            print(number_of_tank)
             teleport_image.do(FadeIn(0) + FadeOut(1))
-            if number_of_tank == 1:
-                tank1_body_layer.tank_body_image.do(
+            #if number_of_tank == 1:
+            #    tank1_body_layer.tank_body_image.do(
+            #        RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
+            #            -20, 0.2) + RotateBy(20, 0.2))
+#
+            #if number_of_tank == 2:
+            #    tank2_body_layer.tank_body_image.do(
+            #        RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
+            #            -20, 0.2) + RotateBy(20, 0.2))
+
+            tank1_body_layer.tank_body_image.do(
                     RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
 
-            if number_of_tank == 2:
-                tank2_body_layer.tank_body_image.do(
+
+            tank2_body_layer.tank_body_image.do(
                     RotateBy(-360, 0.3) + RotateBy(-20, 0.2) + RotateBy(+20, 0.2) + RotateBy(
                         -20, 0.2) + RotateBy(20, 0.2))
 
-            self.target.x = random.randint(LEFT_DOWN_END_OF_MAP, RIGHT_END_OF_MAP)
-            self.target.y = random.randint(LEFT_DOWN_END_OF_MAP, UP_END_OF_MAP)
+            tank1_body_layer.tank_body_image.x = random.randint(LEFT_DOWN_END_OF_MAP, RIGHT_END_OF_MAP)
+            tank1_body_layer.tank_body_image.y = random.randint(LEFT_DOWN_END_OF_MAP, UP_END_OF_MAP)
+            tank2_body_layer.tank_body_image.x = random.randint(LEFT_DOWN_END_OF_MAP, RIGHT_END_OF_MAP)
+            tank2_body_layer.tank_body_image.y = random.randint(LEFT_DOWN_END_OF_MAP, UP_END_OF_MAP)
             TankBodyDriver.attach(self, number_of_tank, self.target.x, self.target.y)
 
             tank2_health -= WALL_DAMAGE * 5

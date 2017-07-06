@@ -4,8 +4,8 @@ stages:
 
 build:
   stage: build
-  script:
-    - command build
+  script: python setup.py sdist
+    - 
   only:
     - branches
 

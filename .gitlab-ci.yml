@@ -4,4 +4,5 @@ stages:
 test_python:
     stage: test
     script: 
-    - py.test test_main.py
+    - pip install -U pytest
+    - pytest -q test_main.py

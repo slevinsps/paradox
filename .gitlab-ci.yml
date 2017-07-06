@@ -5,7 +5,7 @@ stages:
 
 build_job:
   stage: build
-  script: python setup.py bdist --format = zip
+  script: python main.py bdist --format = zip
 
 
 test_job:

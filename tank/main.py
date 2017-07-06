@@ -17,7 +17,7 @@ from cocos.actions import*
 from pyglet.window import key
 from cocos.director import director
 from cocos.scenes.transitions import FadeTRTransition
-from cocos.actions import Rotate, ScaleBy, RotateTo
+from cocos.actions import Rotate, ScaleBy
 import FirstTankClass  # Класс управления первого пользователя
 import SecondTankClass  # Класс управления второго пользователя
 import inspect  # Стек функций, нужен, чтобы определить, какая функция какую функцию вызывает
@@ -32,8 +32,8 @@ keyboard = key.KeyStateHandler()
 scroller = ScrollingManager()
 
 # Координаты тела первого танка
-tank1_body_position_x = 250
-tank1_body_position_y = 150
+tank1_body_position_x = 100
+tank1_body_position_y = 100
 tank1_body_rotation = 0
 
 # Координаты тела второго танка
@@ -63,11 +63,11 @@ tank1_gun_rotation = 0
 tank2_gun_rotation = 0
 
 # Здороваье и урон первого танка
-tank1_health = 100
+tank1_health = 1000
 TANK1_DAMAGE = 10
 
 # Здороваье и урон второго танка
-tank2_health = 100
+tank2_health = 1000
 TANK2_DAMAGE = 10
 
 # Урон от столкновения со стенами
@@ -361,7 +361,7 @@ class TankBulletDriver(Driver):
                     is_hitted1 = True
                     tank2_health -= TANK1_DAMAGE
                     tank2_body_layer.tank_body_image.do(
-                            RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+                            RotateBy(-15, 0.2) + RotateBy(+15, 0.2) + RotateBy(-15, 0.2) + RotateBy(+15, 0.2))
 
                 if tank2_health <= 0:
                     tank2_body_layer.tank_body_image.do(
@@ -379,7 +379,7 @@ class TankBulletDriver(Driver):
                     is_hitted2 = True
                     tank1_health -= TANK1_DAMAGE
                     tank1_body_layer.tank_body_image.do(
-                        RotateTo(-15, 0.2) + RotateTo(+15, 0.2) + RotateTo(-15, 0.2) + RotateTo(+15, 0.2))
+                        RotateBy(-15, 0.2) + RotateBy(+15, 0.2) + RotateBy(-15, 0.2) + RotateBy(+15, 0.2))
 
                 if tank1_health <= 0:
                     TankLibraryInitialize.die(1)
@@ -585,7 +585,7 @@ class TankBodyDriver (Driver):
             tank1_gun_layer.whoom_control_image.y = y + TANK_WIDTH
 
             tank1_gun_layer.reload_image.x = x + 30 + RELOAD_IMAGE_SIZE
-            tank1_gun_layer.reload_image.y = x + TANK_HEIGHT
+            tank1_gun_layer.reload_image.y = y + TANK_HEIGHT
 
             tank1_gun_layer.nickname_label.x = x - TANK_WIDTH
             tank1_gun_layer.nickname_label.y = y + TANK_HEIGHT + RELOAD_IMAGE_SIZE
@@ -1418,11 +1418,11 @@ class TankLibraryInitialize(TankMechanics):
                 if len(tank2_gun_layer.nickname_label.element.text) < 10:
 
                     name = ' '*(9-len(tank2_gun_layer.nickname_label.element.text))+name
-                    print(9-len(tank1_gun_layer.nickname_label.element.text))
+
                 name = name + tank2_gun_layer.nickname_label.element.text
                 bool_border1 = 0
                 num = 1
-                count1 += 1
+                count2 += 1
 
             elif number_of_tank == 2:
 
@@ -1441,7 +1441,7 @@ class TankLibraryInitialize(TankMechanics):
                 name = name+tank1_gun_layer.nickname_label.element.text
                 bool_border2 = 0
                 num = 2
-                count2 += 1
+                count1 += 1
             else:
                 tank2_body_layer.tank_body_image.do(
                     ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2) + ScaleBy(1.5, 0.2) + ScaleBy(2 / 3, 0.2))
@@ -1474,6 +1474,8 @@ class TankLibraryInitialize(TankMechanics):
             if len(len2) == 1:
                 len2 = '0' + len2
             ConnectionClass.stop_all(1)
+            timer_label.stop()
+            timer_label.element.color = (255, 255, 255, 180)
             final_scene = Scene()
             final_scene.add(FinalBack())
             final_scene.add(FinalScene(name,num))
@@ -1597,6 +1599,18 @@ class FinalScene(Layer):
     def __init__(self, winner,num):
         super(FinalScene, self).__init__()
         global count1, count2
+        back_color = Sprite("res/back_color.png")
+        #print(count1,'   ',count2)
+        if count1 == 0 and count2 == 0:
+            pos_x = 400
+        elif count1 == 0:
+              pos_x = 800
+        elif count2 == 0:
+            pos_x = 0
+        else:
+            pos_x = 800*count2/(count2+count1)
+        print(pos_x)
+        back_color.position = (pos_x,300)
         text1 = Label("Конец игры", font_name='Oswald', font_size = 70)
         text2 = Label(winner, font_name = 'Oswald', font_size = 35)
         text1.position = (155, 490)
@@ -1604,6 +1618,7 @@ class FinalScene(Layer):
         if text2.element.text == "Ничья":
             text2.position = (320, 370)
 
+        self.add(back_color)
         self.add(text1)
         self.add(text2)
 
@@ -1733,6 +1748,7 @@ class FinalMenu(Menu):
         health_strip2.do(FadeIn(0))
 
         director.replace(FadeTRTransition(scene, duration=2))
+        timer_label.do(TimerDriver())
 #################################
 
 

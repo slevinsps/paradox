@@ -46,11 +46,11 @@ tank1_gun_rotation = 0
 tank2_gun_rotation = 0
 
 # Здороваье и урон первого танка
-tank1_health = 100
+tank1_health = 150
 TANK1_DAMAGE = 8
 
 # Здороваье и урон второго танка
-tank2_health = 100
+tank2_health = 150
 TANK2_DAMAGE = 8
 
 # Максимальная скорость движения ракеты
@@ -531,7 +531,7 @@ class TankBodyDriver (Driver):
             tank2_gun_layer.whoom_control_image.x = x - 30 - RELOAD_IMAGE_SIZE
             tank2_gun_layer.whoom_control_image.y = y + TANK_WIDTH
 
-            tank2_gun_layer.reload_image.x = x + 30 + RELOAD_IMAGE_SIZE
+            tank2_gun_layer.reload_image.x = x + 30 + RELOAD_IMAGE_SIZE * 2
             tank2_gun_layer.reload_image.y = y + TANK_HEIGHT
 
             tank2_gun_layer.nickname_label.x = x - TANK_WIDTH
@@ -555,7 +555,7 @@ class TankBodyDriver (Driver):
             tank1_gun_layer.whoom_control_image.x = x - 30 - RELOAD_IMAGE_SIZE
             tank1_gun_layer.whoom_control_image.y = y + TANK_WIDTH
 
-            tank1_gun_layer.reload_image.x = x + 30 + RELOAD_IMAGE_SIZE
+            tank1_gun_layer.reload_image.x = x + 30 + RELOAD_IMAGE_SIZE * 2
             tank1_gun_layer.reload_image.y = y + TANK_HEIGHT
 
             tank1_gun_layer.nickname_label.x = x - TANK_WIDTH
@@ -1679,7 +1679,7 @@ class FinalScene(Layer):
             pos_x = 0
         else:
             pos_x = 800 * count2 / (count2 + count1)
-        print(pos_x)
+        back_color.do(FadeIn(2))
         back_color.position = (pos_x, 300)
         text1 = Label("Конец игры", font_name='Oswald', font_size=70)
         text2 = Label(winner, font_name='Oswald', font_size=35)
@@ -1766,10 +1766,10 @@ class FinalMenu(Menu):
         tank2_gun_layer.tank_gun_image.rotation = 0
 
         # Здороваье и урон первого танка
-        tank1_health = 100
+        tank1_health = 150
 
         # Здороваье и урон второго танка
-        tank2_health = 100
+        tank2_health = 150
 
         bool_end = 1
         bool_border1 = 1

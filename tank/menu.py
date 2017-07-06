@@ -80,6 +80,8 @@ class MainMenu(Menu):
         pass
 
     def on_play(self):
+        global disconnect
+        disconnect = 1
         try:
             shutil.rmtree('dest')
         except FileNotFoundError:

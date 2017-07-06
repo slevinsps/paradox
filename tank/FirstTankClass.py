@@ -20,6 +20,7 @@ def strategy3(self):
 name = 'Елизавета' #3.0
 model = 'light' #3.0
 
+
 def strategy(functions):
     if functions.get_y() <= 150:
         if functions.get_x() > 200 and functions.get_x() < 800 :
@@ -38,9 +39,5 @@ def strategy(functions):
 
     if functions.get_speed() == 0:
         functions.move_tank_body('w', 80)
-    print(functions.get_boolean_recharging())
-    if functions.get_boolean_recharging():
-        print('stoop')
-        #functions.rotate_body(40, 'right', 1)
     functions.make_gun_angle(functions.determine_angle())
     functions.fire()

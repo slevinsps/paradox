@@ -1,7 +1,6 @@
-stages:
-  - test
-
-test_job:
-  stage: test
-  script: pytest
-
+test:python35:
+    image: python:3.5
+    script: 
+    - pip install -r requirements.txt  
+    - export PYTHONPATH=../
+    - py.test -v --cov

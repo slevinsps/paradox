@@ -4,4 +4,4 @@ stages:
 test_python:
     stage: test
     script: 
-    - pytest -v
+    - py.test test_main.py

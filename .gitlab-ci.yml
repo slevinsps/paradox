@@ -5,6 +5,7 @@ stages:
 build:
   stage: build
   script: 
+  - pip install setuptools
   - python setup.py sdist
   only:
     - branches

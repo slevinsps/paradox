@@ -56,6 +56,14 @@ class TankMechanics(object):
     def rotate_gun(angle=1, side='right', continued=0):
         pass
 
+    '''Поворачивает корпус'''
+    '''angle - угол поворота(в градусах), строго больше нуля'''
+    '''side - выбор направления вращения. rigtht - по часовой, left - против часовой'''
+    '''continued. 0 - повторить действие 1 раз. 1 - постоянное повторение'''
+    @staticmethod
+    def rotate_body(angle=1, side='right', continued=0):
+        pass
+
     '''Узнать расстояние между танками'''
     @staticmethod
     def get_distance_between_tanks():

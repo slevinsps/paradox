@@ -4,8 +4,9 @@ stages:
 
 build:
   stage: build
-  script: python setup.py sdist
-    - 
+  script: 
+  - apt-get install python3-setuptools
+  - python setup.py sdist
   only:
     - branches
 

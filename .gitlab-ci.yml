@@ -5,7 +5,7 @@ stages:
 
 build_job:
   stage: build
-  script: 
+  script: cd schema && make && cd ../server && make
 
 
 test_job:

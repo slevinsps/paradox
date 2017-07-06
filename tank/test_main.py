@@ -1,7 +1,7 @@
+import pytest
 import main
 from math import*
 import os
-import pytest
 import pyglet
 import time
 

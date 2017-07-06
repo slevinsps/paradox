@@ -1,0 +1,18 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build_job:
+  stage: build
+  script: python setup.py bdist --format = zip
+
+
+test_job:
+  stage: test
+  script: pytest -v
+
+deploy_job:
+  stage: deploy
+  script: echo 'Start'
+  when: manual

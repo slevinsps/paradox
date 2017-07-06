@@ -1,18 +1,7 @@
 stages:
-  - build
   - test
-  - deploy
-
-build_job:
-  stage: build
-  script: cd schema && make && cd ../server && make
-
 
 test_job:
   stage: test
   script: pytest
 
-deploy_job:
-  stage: deploy
-  script: echo 'Start'
-  when: manual

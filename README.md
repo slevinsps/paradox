@@ -3,4 +3,4 @@
 
 Презентация2 - https://docs.google.com/presentation/d/1aryLEaOvAU2KHHiffkVJg0Li360h4qY9QNTo--as56A/edit?usp=sharing
 
-Видеоролик - https://www.youtube.com/watch?v=5AxUW8dZVyo
+Видеоролик - https://www.youtube.com/watch?v=uHEkP8wDJFA&t=3s

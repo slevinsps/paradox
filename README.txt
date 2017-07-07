@@ -1,4 +1,0 @@
-Description
-===========
-
-Tank Battles AI

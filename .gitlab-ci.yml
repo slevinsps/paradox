@@ -4,10 +4,11 @@ stages:
 
 build:
   stage: build
-  script: 
-  - apt-get update
-  - apt-get install python-pip
-  - python setup.py sdist
+  script:
+  - export DATABASE_URL=postgres://postgres:@5432/python-test-app 
+  - apt-get update -qy
+  - apt-get install -y python3-dev python-pip
+  - python3 
   only:
     - branches
 
